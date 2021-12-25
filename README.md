@@ -1,2 +1,2 @@
-# javabase
-Javabase homeworks
+# basejava
+BaseJava homeworks
