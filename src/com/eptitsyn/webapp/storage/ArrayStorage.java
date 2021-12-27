@@ -30,22 +30,22 @@ public class ArrayStorage {
     }
 
     public Resume get(String uuid) {
-        int resemeIndex = getIndex(uuid);
-        if (resemeIndex == -1) {
+        int resumeIndex = getIndex(uuid);
+        if (resumeIndex == -1) {
             System.out.println("Resume with uuid=" + uuid + " not found");
             return null;
         }
-        return storage[resemeIndex];
+        return storage[resumeIndex];
     }
 
     public void delete(String uuid) {
-        int resemeIndex = getIndex(uuid);
-        if (resemeIndex == -1) {
+        int resumeIndex = getIndex(uuid);
+        if (resumeIndex == -1) {
             System.out.println("Resume with uuid=" + uuid + " not found");
             return;
         }
         count--;
-        storage[resemeIndex] = storage[count];
+        storage[resumeIndex] = storage[count];
         storage[count] = null;
     }
 
@@ -61,12 +61,12 @@ public class ArrayStorage {
     }
 
     public void update(Resume resume) {
-        int resemeIndex = getIndex(resume.getUuid());
-        if (resemeIndex == -1) {
+        int resumeIndex = getIndex(resume.getUuid());
+        if (resumeIndex == -1) {
             System.out.println("Resume with uuid=" + resume.getUuid() + " not found");
             return;
         }
-        storage[resemeIndex] = resume;
+        storage[resumeIndex] = resume;
     }
 
     private int getIndex(String uuid) {
