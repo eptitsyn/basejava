@@ -1,13 +1,14 @@
 package com.eptitsyn.webapp;
 
 import com.eptitsyn.webapp.model.Resume;
-import com.eptitsyn.webapp.storage.ArrayStorage;
+import com.eptitsyn.webapp.storage.AbstractArrayStorage;
+import com.eptitsyn.webapp.storage.SortedArrayStorage;
 
 /**
  * Test for your com.urise.webapp.storage.ArrayStorage implementation
  */
 public class MainTestArrayStorage {
-    static final ArrayStorage ARRAY_STORAGE = new ArrayStorage();
+    static final AbstractArrayStorage ARRAY_STORAGE = new SortedArrayStorage();
 
     public static void main(String[] args) {
         Resume r1 = new Resume();
@@ -37,6 +38,7 @@ public class MainTestArrayStorage {
         ARRAY_STORAGE.update(r4);
 
         System.out.println("Size: " + ARRAY_STORAGE.size());
+
     }
 
     static void printAll() {
