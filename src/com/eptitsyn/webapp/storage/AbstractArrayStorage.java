@@ -1,7 +1,6 @@
 package com.eptitsyn.webapp.storage;
 
 import com.eptitsyn.webapp.model.Resume;
-
 import java.util.Arrays;
 
 public abstract class AbstractArrayStorage implements Storage {
@@ -31,7 +30,7 @@ public abstract class AbstractArrayStorage implements Storage {
             System.out.println("No free space for saving new resume");
             return;
         }
-        if (getIndex(r.getUuid()) != -1) {
+        if (getIndex(r.getUuid()) >= 0) {
             System.out.println("Resume with uuid=" + r.getUuid() + " already exist.");
             return;
         }

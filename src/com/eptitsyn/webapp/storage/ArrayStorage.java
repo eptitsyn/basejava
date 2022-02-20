@@ -1,9 +1,5 @@
 package com.eptitsyn.webapp.storage;
 
-import com.eptitsyn.webapp.model.Resume;
-
-import java.util.Arrays;
-
 /**
  * Array based storage for Resumes
  */
