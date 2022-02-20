@@ -16,9 +16,7 @@ public class SortedArrayStorage extends AbstractArrayStorage {
     protected int allocateElement(String uuid) {
         if (count == 0) return 0;
         int insertPos = getIndex(uuid);
-        System.out.println("insertpos = " + insertPos);
         insertPos = (insertPos >= 0) ? insertPos : (-(insertPos) - 1);
-        System.out.println("insertpos = " + insertPos);
         if (count - insertPos >= 0) System.arraycopy(storage, insertPos, storage, insertPos + 1, count - insertPos);
         return insertPos;
     }
