@@ -15,12 +15,13 @@ public class ArrayStorage extends AbstractArrayStorage {
     }
 
     @Override
-    protected int allocateElement(String uuid) {
+    protected int allocateResume(String uuid) {
         return count;
     }
 
     @Override
-    protected void deallocateElement(int index) {
+    protected void deallocateResume(int index) {
         storage[index] = null;
+        System.arraycopy(storage, index + 1, storage, index, count - 1 - index);
     }
 }

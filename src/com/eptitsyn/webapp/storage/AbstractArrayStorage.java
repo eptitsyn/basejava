@@ -1,6 +1,7 @@
 package com.eptitsyn.webapp.storage;
 
 import com.eptitsyn.webapp.model.Resume;
+
 import java.util.Arrays;
 
 public abstract class AbstractArrayStorage implements Storage {
@@ -30,11 +31,12 @@ public abstract class AbstractArrayStorage implements Storage {
             System.out.println("No free space for saving new resume");
             return;
         }
-        if (getIndex(r.getUuid()) >= 0) {
-            System.out.println("Resume with uuid=" + r.getUuid() + " already exist.");
+        String uuid = r.getUuid();
+        if (getIndex(uuid) >= 0) {
+            System.out.println("Resume with uuid=" + uuid + " already exist.");
             return;
         }
-        int index = allocateElement(r.getUuid());
+        int index = allocateResume(uuid);
         storage[index] = r;
         count++;
     }
@@ -55,7 +57,7 @@ public abstract class AbstractArrayStorage implements Storage {
             System.out.println("Resume " + uuid + " not exist");
             return;
         }
-        deallocateElement(index);
+        deallocateResume(index);
         count--;
     }
 
@@ -68,9 +70,9 @@ public abstract class AbstractArrayStorage implements Storage {
         return count;
     }
 
-    protected abstract void deallocateElement(int index);
+    protected abstract void deallocateResume(int index);
+
+    protected abstract int allocateResume(String uuid);
 
     protected abstract int getIndex(String uuid);
-
-    protected abstract int allocateElement(String uuid);
 }
