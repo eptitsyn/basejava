@@ -10,14 +10,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 abstract class AbstractArrayStorageTest {
-    protected Storage storage;
-
     protected static final int PRELOADED_RESUMES = 5;
     protected static final String UUID_1 = "uuid1";
     protected static final String UUID_2 = "uuid2";
     protected static final String UUID_3 = "uuid3";
     protected static final String UUID_4 = "uuid4";
     protected static final String UUID_5 = "uuid5";
+    protected Storage storage;
 
     public AbstractArrayStorageTest(Storage storage) {
         this.storage = storage;
@@ -52,18 +51,18 @@ abstract class AbstractArrayStorageTest {
     void save() {
         Resume r = new Resume();
         storage.save(r);
-        assertEquals(PRELOADED_RESUMES+1, storage.size());
+        assertEquals(PRELOADED_RESUMES + 1, storage.size());
         assertNotNull(storage.get(r.getUuid()));
         assertThrows(ExistStorageException.class, () -> storage.save(r));
     }
 
     @Test
     void saveLimit() throws NoSuchFieldException, IllegalAccessException {
-        int limit =AbstractArrayStorage.class
+        int limit = AbstractArrayStorage.class
                 .getDeclaredField("STORAGE_LIMIT")
                 .getInt(storage);
-        assertDoesNotThrow(()->{
-            for (int i = 0; i < limit-PRELOADED_RESUMES; i++) {
+        assertDoesNotThrow(() -> {
+            for (int i = 0; i < limit - PRELOADED_RESUMES; i++) {
                 storage.save(new Resume());
             }
         });
@@ -97,8 +96,8 @@ abstract class AbstractArrayStorageTest {
     void size() {
         assertEquals(PRELOADED_RESUMES, storage.size());
         storage.save(new Resume());
-        assertEquals(PRELOADED_RESUMES+1, storage.size());
+        assertEquals(PRELOADED_RESUMES + 1, storage.size());
         storage.save(new Resume());
-        assertEquals(PRELOADED_RESUMES+2, storage.size());
+        assertEquals(PRELOADED_RESUMES + 2, storage.size());
     }
 }

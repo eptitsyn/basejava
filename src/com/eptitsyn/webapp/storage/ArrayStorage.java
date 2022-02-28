@@ -7,13 +7,10 @@ import com.eptitsyn.webapp.model.Resume;
  */
 public class ArrayStorage extends AbstractArrayStorage {
 
-    protected int getIndex(String uuid) {
-        for (int i = 0; i < count; i++) {
-            if (storage[i].getUuid().equals(uuid)) {
-                return i;
-            }
-        }
-        return -1;
+    @Override
+    protected void deallocateResume(int index) {
+        storage[index] = null;
+        System.arraycopy(storage, index + 1, storage, index, count - 1 - index);
     }
 
     @Override
@@ -21,9 +18,12 @@ public class ArrayStorage extends AbstractArrayStorage {
         storage[count] = resume;
     }
 
-    @Override
-    protected void deallocateResume(int index) {
-        storage[index] = null;
-        System.arraycopy(storage, index + 1, storage, index, count - 1 - index);
+    protected int getIndex(String uuid) {
+        for (int i = 0; i < count; i++) {
+            if (storage[i].getUuid().equals(uuid)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
