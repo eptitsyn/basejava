@@ -1,6 +1,7 @@
 package com.eptitsyn.webapp.storage;
 
 import com.eptitsyn.webapp.model.Resume;
+
 import java.util.Arrays;
 
 public class SortedArrayStorage extends AbstractArrayStorage {
@@ -13,11 +14,14 @@ public class SortedArrayStorage extends AbstractArrayStorage {
     }
 
     @Override
-    protected int allocateResume(String uuid) {
-        if (count == 0) return 0;
-        int insertPos = -getIndex(uuid)-1;
+    protected void putResume(Resume resume, int index) {
+        if (count == 0) {
+            storage[0] = resume;
+            return;
+        }
+        int insertPos = -index-1;
         System.arraycopy(storage, insertPos, storage, insertPos + 1, count - insertPos);
-        return insertPos;
+        storage[insertPos] = resume;
     }
 
     @Override

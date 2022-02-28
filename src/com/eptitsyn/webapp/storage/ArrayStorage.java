@@ -1,5 +1,7 @@
 package com.eptitsyn.webapp.storage;
 
+import com.eptitsyn.webapp.model.Resume;
+
 /**
  * Array based storage for Resumes
  */
@@ -15,8 +17,8 @@ public class ArrayStorage extends AbstractArrayStorage {
     }
 
     @Override
-    protected int allocateResume(String uuid) {
-        return count;
+    protected void putResume(Resume resume, int index) {
+        storage[count] = resume;
     }
 
     @Override
