@@ -7,16 +7,16 @@ import com.eptitsyn.webapp.model.Resume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
+import static com.eptitsyn.webapp.storage.AbstractArrayStorage.STORAGE_LIMIT;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 abstract class AbstractArrayStorageTest {
-    protected static final int PRELOADED_RESUMES = 5;
-    protected static final String UUID_1 = "uuid1";
-    protected static final String UUID_2 = "uuid2";
-    protected static final String UUID_3 = "uuid3";
-    protected static final String UUID_4 = "uuid4";
-    protected static final String UUID_5 = "uuid5";
+    protected static final int EXPECTED_SIZE = 5;
     protected Storage storage;
+    protected Resume[] testResume = new Resume[EXPECTED_SIZE];
 
     public AbstractArrayStorageTest(Storage storage) {
         this.storage = storage;
@@ -25,25 +25,28 @@ abstract class AbstractArrayStorageTest {
     @BeforeEach
     void setUp() {
         storage.clear();
-        storage.save(new Resume(UUID_1));
-        storage.save(new Resume(UUID_2));
-        storage.save(new Resume(UUID_3));
-        storage.save(new Resume(UUID_4));
-        storage.save(new Resume(UUID_5));
+        for (int i = 0; i < EXPECTED_SIZE; i++) {
+            Resume r = new Resume();
+            storage.save(r);
+            testResume[i] = r;
+        }
     }
 
     @Test
     void clear() {
-        assertEquals(PRELOADED_RESUMES, storage.size());
+        assertEquals(EXPECTED_SIZE, storage.size());
         storage.clear();
         assertEquals(0, storage.size());
     }
 
     @Test
     void update() {
-        Resume r = new Resume(UUID_4);
-        storage.update(r);
-        assertEquals(r, storage.get(UUID_4));
+        storage.update(testResume[3]);
+        assertSame(testResume[3], storage.get(testResume[3].getUuid()));
+    }
+
+    @Test
+    void updateNotExisting() {
         assertThrows(NotExistStorageException.class, () -> storage.update(new Resume()));
     }
 
@@ -51,18 +54,21 @@ abstract class AbstractArrayStorageTest {
     void save() {
         Resume r = new Resume();
         storage.save(r);
-        assertEquals(PRELOADED_RESUMES + 1, storage.size());
+        assertEquals(EXPECTED_SIZE + 1, storage.size());
         assertNotNull(storage.get(r.getUuid()));
+    }
+
+    @Test
+    void saveExists() {
+        Resume r = new Resume();
+        storage.save(r);
         assertThrows(ExistStorageException.class, () -> storage.save(r));
     }
 
     @Test
-    void saveLimit() throws NoSuchFieldException, IllegalAccessException {
-        int limit = AbstractArrayStorage.class
-                .getDeclaredField("STORAGE_LIMIT")
-                .getInt(storage);
+    void saveLimit() {
         assertDoesNotThrow(() -> {
-            for (int i = 0; i < limit - PRELOADED_RESUMES; i++) {
+            for (int i = 0; i < (STORAGE_LIMIT - EXPECTED_SIZE); i++) {
                 storage.save(new Resume());
             }
         });
@@ -71,33 +77,42 @@ abstract class AbstractArrayStorageTest {
 
     @Test
     void get() {
-        assertEquals(storage.get(UUID_4).getUuid(), UUID_4);
+        assertSame(storage.get(testResume[3].getUuid()), testResume[3]);
     }
 
     @Test
-    void updateGetNotExist() {
-        assertThrows(NotExistStorageException.class, () -> storage.get("dummy"));
+    void getNotExist() {
+        assertThrows(StorageException.class, () -> storage.get(new Resume().getUuid()));
     }
-
 
     @Test
     void delete() {
-        storage.delete(UUID_4);
-        assertThrows(NotExistStorageException.class, () -> storage.delete(UUID_4));
+        storage.delete(testResume[3].getUuid());
+        assertThrows(NotExistStorageException.class, () -> storage.delete(testResume[3].getUuid()));
+    }
+
+    @Test
+    void deleteNotExisting() {
+        assertThrows(NotExistStorageException.class, () -> storage.delete(new Resume().getUuid()));
     }
 
     @Test
     void getAll() {
         Resume[] resumes = storage.getAll();
-        assertEquals(resumes.length, PRELOADED_RESUMES);
+        assertEquals(resumes.length, EXPECTED_SIZE);
+
+        Resume[] sorted = Arrays.copyOf(testResume, EXPECTED_SIZE);
+        Arrays.sort(resumes);
+        Arrays.sort(sorted);
+        assertEquals(Arrays.compare(resumes, sorted), 0);
     }
 
     @Test
     void size() {
-        assertEquals(PRELOADED_RESUMES, storage.size());
+        assertEquals(EXPECTED_SIZE, storage.size());
         storage.save(new Resume());
-        assertEquals(PRELOADED_RESUMES + 1, storage.size());
+        assertEquals(EXPECTED_SIZE + 1, storage.size());
         storage.save(new Resume());
-        assertEquals(PRELOADED_RESUMES + 2, storage.size());
+        assertEquals(EXPECTED_SIZE + 2, storage.size());
     }
 }
