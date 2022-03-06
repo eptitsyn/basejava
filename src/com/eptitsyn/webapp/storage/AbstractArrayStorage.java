@@ -1,13 +1,12 @@
 package com.eptitsyn.webapp.storage;
 
-import com.eptitsyn.webapp.exception.ExistStorageException;
 import com.eptitsyn.webapp.exception.NotExistStorageException;
 import com.eptitsyn.webapp.exception.StorageException;
 import com.eptitsyn.webapp.model.Resume;
 
 import java.util.Arrays;
 
-public abstract class AbstractArrayStorage implements Storage {
+public abstract class AbstractArrayStorage extends AbstractStorage {
 
     protected static final int STORAGE_LIMIT = 10000;
     protected Resume[] storage = new Resume[STORAGE_LIMIT];
@@ -19,38 +18,37 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     @Override
-    public void update(Resume r) {
+    public Resume[] getAll() {
+        return Arrays.copyOf(storage, count);
+    }
+
+    public int size() {
+        return count;
+    }
+
+    @Override
+    public void doUpdate(Resume r) {
         int index = getIndex(r.getUuid());
-        if (index < 0) {
-            throw new NotExistStorageException(r.getUuid());
-        }
         storage[index] = r;
     }
 
     @Override
-    public void save(Resume r) {
+    protected void doSave(Resume r) {
         if (count >= storage.length) {
             throw new StorageException("No free space for saving new resume", r.getUuid());
         }
-        String uuid = r.getUuid();
-        int index = getIndex(uuid);
-        if (index >= 0) {
-            throw new ExistStorageException(uuid);
-        }
-        putResume(r, index);
+
+        putResume(r, getIndex(r.getUuid()));
         count++;
     }
 
-    public Resume get(String uuid) {
+    public Resume doGet(String uuid) {
         int index = getIndex(uuid);
-        if (index < 0) {
-            throw new NotExistStorageException(uuid);
-        }
         return storage[index];
     }
 
     @Override
-    public void delete(String uuid) {
+    public void doDelete(String uuid) {
         int index = getIndex(uuid);
         if (index < 0) {
             throw new NotExistStorageException(uuid);
@@ -60,12 +58,8 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     @Override
-    public Resume[] getAll() {
-        return Arrays.copyOf(storage, count);
-    }
-
-    public int size() {
-        return count;
+    protected boolean isExist(String uuid) {
+        return getIndex(uuid) >= 0;
     }
 
     protected abstract void deallocateResume(int index);
