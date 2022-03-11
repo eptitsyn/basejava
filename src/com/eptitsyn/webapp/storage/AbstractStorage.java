@@ -8,23 +8,25 @@ public abstract class AbstractStorage implements Storage {
 
     @Override
     public void update(Resume r) {
-        if (!isExist(r.getUuid())) {
-            throw new NotExistStorageException(r.getUuid());
+        String uuid = r.getUuid();
+        if (!isExist(uuid)) {
+            throw new NotExistStorageException(uuid);
         }
-        doUpdate(r);
+        doUpdate(r, getIndex(uuid));
     }
 
-    protected abstract void doUpdate(Resume r);
+    protected abstract void doUpdate(Resume r, int index);
 
     @Override
     public void save(Resume r) {
-        if (isExist(r.getUuid())) {
-            throw new ExistStorageException(r.getUuid());
+        String uuid = r.getUuid();
+        if (isExist(uuid)) {
+            throw new ExistStorageException(uuid);
         }
-        doSave(r);
+        doSave(r, getIndex(uuid));
     }
 
-    protected abstract void doSave(Resume r);
+    protected abstract void doSave(Resume r, int index);
 
     @Override
     public Resume get(String uuid) {
@@ -32,20 +34,20 @@ public abstract class AbstractStorage implements Storage {
             throw new NotExistStorageException(uuid);
         }
 
-        return doGet(uuid);
+        return doGet(uuid, getIndex(uuid));
     }
 
-    protected abstract Resume doGet(String uuid);
+    protected abstract Resume doGet(String uuid, int index);
 
     @Override
     public void delete(String uuid) {
         if (!isExist(uuid)) {
             throw new NotExistStorageException(uuid);
         }
-        doDelete(uuid);
+        doDelete(uuid, getIndex(uuid));
     }
 
-    protected abstract void doDelete(String uuid);
+    protected abstract void doDelete(String uuid, int index);
 
     protected abstract boolean isExist(String uuid);
 

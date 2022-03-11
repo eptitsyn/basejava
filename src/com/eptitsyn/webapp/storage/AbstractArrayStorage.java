@@ -27,29 +27,26 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    public void doUpdate(Resume r) {
-        int index = getIndex(r.getUuid());
+    public void doUpdate(Resume r, int index) {
         storage[index] = r;
     }
 
     @Override
-    protected void doSave(Resume r) {
+    protected void doSave(Resume r, int index) {
         if (count >= storage.length) {
             throw new StorageException("No free space for saving new resume", r.getUuid());
         }
 
-        putResume(r, getIndex(r.getUuid()));
+        putResume(r, index);
         count++;
     }
 
-    public Resume doGet(String uuid) {
-        int index = getIndex(uuid);
+    public Resume doGet(String uuid, int index) {
         return storage[index];
     }
 
     @Override
-    public void doDelete(String uuid) {
-        int index = getIndex(uuid);
+    public void doDelete(String uuid, int index) {
         if (index < 0) {
             throw new NotExistStorageException(uuid);
         }
