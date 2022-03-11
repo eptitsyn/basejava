@@ -3,15 +3,14 @@ package com.eptitsyn.webapp.storage;
 import com.eptitsyn.webapp.model.Resume;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class ListStorage extends AbstractStorage {
-    List<Resume> storage = new ArrayList<>();
+    private final List<Resume> storage = new ArrayList<>();
 
     @Override
     protected void doUpdate(Resume r) {
-        storage.set(storage.indexOf(r), r);
+        storage.set(getIndex(r.getUuid()), r);
     }
 
     @Override
@@ -21,7 +20,7 @@ public class ListStorage extends AbstractStorage {
 
     @Override
     protected Resume doGet(String uuid) {
-        return storage.get(storage.indexOf(new Resume(uuid)));
+        return storage.get(getIndex(uuid));
     }
 
     @Override
@@ -32,6 +31,11 @@ public class ListStorage extends AbstractStorage {
     @Override
     protected boolean isExist(String uuid) {
         return storage.contains(new Resume(uuid));
+    }
+
+    @Override
+    protected int getIndex(String uuid) {
+        return storage.indexOf(new Resume(uuid));
     }
 
     @Override
@@ -48,4 +52,6 @@ public class ListStorage extends AbstractStorage {
     public int size() {
         return storage.size();
     }
+
+
 }

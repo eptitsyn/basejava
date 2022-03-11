@@ -48,4 +48,6 @@ public abstract class AbstractStorage implements Storage {
     protected abstract void doDelete(String uuid);
 
     protected abstract boolean isExist(String uuid);
+
+    protected abstract int getIndex(String uuid);
 }
