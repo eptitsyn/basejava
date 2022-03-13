@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 abstract class AbstractStorageTest {
     protected static final int EXPECTED_SIZE = 5;
-    protected Storage storage;
-    protected Resume[] expectedResumes = new Resume[EXPECTED_SIZE];
+    protected final Storage storage;
+    protected final Resume[] expectedResumes = new Resume[EXPECTED_SIZE];
 
     public AbstractStorageTest(Storage storage) {
         this.storage = storage;

@@ -2,40 +2,40 @@ package com.eptitsyn.webapp.storage;
 
 import com.eptitsyn.webapp.model.Resume;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public class ListStorage extends AbstractStorage {
-    private final List<Resume> storage = new ArrayList<>();
+public class MapStorage extends AbstractStorage {
+    final Map<String, Resume> storage = new HashMap<>();
 
     @Override
     protected void doUpdate(Resume r, Object key) {
-        storage.set((int)key, r);
+        storage.replace((String) key, r);
     }
 
     @Override
     protected void doSave(Resume r, Object key) {
-        storage.add(r);
+        storage.put((String) key, r);
     }
 
     @Override
     protected Resume doGet(String uuid, Object key) {
-        return storage.get((int)key);
+        return storage.get(uuid);
     }
 
     @Override
     protected void doDelete(String uuid, Object key) {
-        storage.remove(new Resume(uuid));
+        storage.remove(uuid);
     }
 
     @Override
     protected boolean isExist(String uuid) {
-        return (int)getIndex(uuid) != -1;
+        return storage.containsKey(uuid);
     }
 
     @Override
     protected Object getIndex(String uuid) {
-        return storage.indexOf(new Resume(uuid));
+        return uuid;
     }
 
     @Override
@@ -45,13 +45,11 @@ public class ListStorage extends AbstractStorage {
 
     @Override
     public Resume[] getAll() {
-        return storage.toArray(new Resume[size()]);
+        return storage.values().toArray(new Resume[0]);
     }
 
     @Override
     public int size() {
         return storage.size();
     }
-
-
 }

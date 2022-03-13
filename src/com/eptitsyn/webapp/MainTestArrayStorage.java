@@ -1,10 +1,8 @@
 package com.eptitsyn.webapp;
 
 import com.eptitsyn.webapp.model.Resume;
-import com.eptitsyn.webapp.storage.AbstractArrayStorage;
 import com.eptitsyn.webapp.storage.AbstractStorage;
 import com.eptitsyn.webapp.storage.ListStorage;
-import com.eptitsyn.webapp.storage.SortedArrayStorage;
 
 /**
  * Test for your com.urise.webapp.storage.ArrayStorage implementation
