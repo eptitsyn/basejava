@@ -55,8 +55,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected boolean isExist(String uuid) {
-        return (int)getIndex(uuid) >= 0;
+    protected boolean isExist(Object key) {
+        return (int) key >= 0;
     }
 
     protected abstract void deallocateResume(int index);

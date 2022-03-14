@@ -6,13 +6,23 @@ import com.eptitsyn.webapp.model.Resume;
 
 public abstract class AbstractStorage implements Storage {
 
+    private Object getSearchKey(String uuid, Boolean exist){
+        Object key = doGetSearchKey(uuid);
+        if (isExist(key) != exist) {
+            if (exist) {
+                throw new NotExistStorageException(uuid);
+            } else {
+                throw new ExistStorageException(uuid);
+            }
+        }
+        return key;
+    }
+
+    protected abstract Object doGetSearchKey(String uuid);
+
     @Override
     public void update(Resume r) {
-        String uuid = r.getUuid();
-        Object key = getIndex(uuid);
-        if (!isExist(uuid)) {
-            throw new NotExistStorageException(uuid);
-        }
+        Object key = getSearchKey(r.getUuid(), true);
         doUpdate(r, key);
     }
 
@@ -20,11 +30,7 @@ public abstract class AbstractStorage implements Storage {
 
     @Override
     public void save(Resume r) {
-        String uuid = r.getUuid();
-        Object key = getIndex(uuid);
-        if (isExist(uuid)) {
-            throw new ExistStorageException(uuid);
-        }
+        Object key = getSearchKey(r.getUuid(), false);
         doSave(r, key);
     }
 
@@ -32,10 +38,7 @@ public abstract class AbstractStorage implements Storage {
 
     @Override
     public Resume get(String uuid) {
-        Object key = getIndex(uuid);
-        if (!isExist(uuid)) {
-            throw new NotExistStorageException(uuid);
-        }
+        Object key = getSearchKey(uuid, true);
         return doGet(uuid, key);
     }
 
@@ -43,16 +46,11 @@ public abstract class AbstractStorage implements Storage {
 
     @Override
     public void delete(String uuid) {
-        Object key = getIndex(uuid);
-        if (!isExist(uuid)) {
-            throw new NotExistStorageException(uuid);
-        }
+        Object key = getSearchKey(uuid, true);
         doDelete(uuid, key);
     }
 
     protected abstract void doDelete(String uuid, Object key);
 
-    protected abstract boolean isExist(String uuid);
-
-    protected abstract Object getIndex(String uuid);
+    protected abstract boolean isExist(Object key);
 }

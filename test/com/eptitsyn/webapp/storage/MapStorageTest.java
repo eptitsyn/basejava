@@ -10,6 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MapStorageTest extends AbstractStorageTest {
 
+    public MapStorageTest() {
+        super(new MapStorage());
+    }
+
     @Test
     @Override
     void getAll() {
@@ -21,9 +25,5 @@ class MapStorageTest extends AbstractStorageTest {
         Arrays.sort(expected);
         Arrays.sort(actual);
         assertArrayEquals(actual, expected);
-    }
-
-    public MapStorageTest() {
-        super(new MapStorage());
     }
 }
