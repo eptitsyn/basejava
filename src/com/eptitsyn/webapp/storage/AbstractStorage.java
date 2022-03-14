@@ -6,14 +6,13 @@ import com.eptitsyn.webapp.model.Resume;
 
 public abstract class AbstractStorage implements Storage {
 
-    private Object getSearchKey(String uuid, Boolean exist){
+    private Object getSearchKey(String uuid, boolean exist) {
         Object key = doGetSearchKey(uuid);
         if (isExist(key) != exist) {
             if (exist) {
                 throw new NotExistStorageException(uuid);
-            } else {
-                throw new ExistStorageException(uuid);
             }
+            throw new ExistStorageException(uuid);
         }
         return key;
     }
