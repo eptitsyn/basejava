@@ -7,21 +7,24 @@ import java.util.UUID;
  */
 public class Resume implements Comparable<Resume> {
 
+
     // Unique identifier
     private final String uuid;
+
+    private String fullName;
 
     public Resume() {
         this(UUID.randomUUID().toString());
     }
 
     public Resume(String uuid) {
+        this(uuid, "");
+    }
+
+    public Resume(String uuid, String fullName) {
         this.uuid = uuid;
+        this.fullName = fullName;
     }
-
-    public String getUuid() {
-        return uuid;
-    }
-
 
     @Override
     public int hashCode() {
@@ -44,6 +47,25 @@ public class Resume implements Comparable<Resume> {
 
     @Override
     public int compareTo(Resume o) {
-        return uuid.compareTo(o.uuid);
+        return compare(this, o);
+    }
+
+    public int compare(Resume o1, Resume o2) {
+        if (o1.getFullName() == null || o2.getFullName() == null || o1.getFullName().equals(o2.getFullName())) {
+            return o1.getUuid().compareTo(o2.getUuid());
+        }
+        return o1.getFullName().compareTo(o2.getFullName());
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 }

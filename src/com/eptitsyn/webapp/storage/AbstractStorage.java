@@ -4,7 +4,16 @@ import com.eptitsyn.webapp.exception.ExistStorageException;
 import com.eptitsyn.webapp.exception.NotExistStorageException;
 import com.eptitsyn.webapp.model.Resume;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class AbstractStorage implements Storage {
+
+    @Override
+    public void update(Resume r) {
+        Object key = getSearchKey(r.getUuid(), true);
+        doUpdate(r, key);
+    }
 
     private Object getSearchKey(String uuid, boolean exist) {
         Object key = doGetSearchKey(uuid);
@@ -17,15 +26,11 @@ public abstract class AbstractStorage implements Storage {
         return key;
     }
 
+    protected abstract void doUpdate(Resume r, Object key);
+
     protected abstract Object doGetSearchKey(String uuid);
 
-    @Override
-    public void update(Resume r) {
-        Object key = getSearchKey(r.getUuid(), true);
-        doUpdate(r, key);
-    }
-
-    protected abstract void doUpdate(Resume r, Object key);
+    protected abstract boolean isExist(Object key);
 
     @Override
     public void save(Resume r) {
@@ -51,5 +56,15 @@ public abstract class AbstractStorage implements Storage {
 
     protected abstract void doDelete(String uuid, Object key);
 
-    protected abstract boolean isExist(Object key);
+    @Override
+    public List<Resume> getAllSorted() {
+        List<Resume> result = new ArrayList<>();
+
+        for (Resume resume : getAll()) {
+            result.add(new Resume(resume.getUuid(), resume.getFullName()));
+        }
+
+        result.sort(Resume::compareTo);
+        return result;
+    }
 }
