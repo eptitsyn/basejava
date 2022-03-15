@@ -7,6 +7,7 @@ import com.eptitsyn.webapp.model.Resume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -86,23 +87,14 @@ abstract class AbstractStorageTest {
     }
 
     @Test
-    void getAll() {
-        Resume[] actual = storage.getAll();
-        assertEquals(actual.length, EXPECTED_SIZE);
-
-        Resume[] expected = Arrays.copyOf(expectedResumes, EXPECTED_SIZE);
-        assertArrayEquals(actual, expected);
-    }
-
-    @Test
     void getAllSorted() {
         List<Resume> actual = storage.getAllSorted();
         assertEquals(actual.size(), EXPECTED_SIZE);
 
-        Resume[] arrayActual = actual.toArray(new Resume[0]);
+        List<Resume> expected = new ArrayList<>(Arrays.asList(expectedResumes));
+        expected.sort(Resume::compareTo);
 
-        Resume[] expected = Arrays.copyOf(expectedResumes, EXPECTED_SIZE);
-        Arrays.sort(expected);
-        assertArrayEquals(arrayActual, expected);
+        assertEquals(actual, expected);
+        assertNotSame(actual, expected);
     }
 }

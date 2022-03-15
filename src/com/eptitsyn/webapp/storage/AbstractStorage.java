@@ -60,11 +60,15 @@ public abstract class AbstractStorage implements Storage {
     public List<Resume> getAllSorted() {
         List<Resume> result = new ArrayList<>();
 
-        for (Resume resume : getAll()) {
-            result.add(new Resume(resume.getUuid(), resume.getFullName()));
+        for (Resume resume : doGetAll()) {
+            if (resume != null) {
+                result.add(new Resume(resume.getUuid(), resume.getFullName()));
+            }
         }
 
         result.sort(Resume::compareTo);
         return result;
     }
+
+    protected abstract List<Resume> doGetAll();
 }
