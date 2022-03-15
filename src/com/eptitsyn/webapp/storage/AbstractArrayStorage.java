@@ -49,9 +49,6 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
 
     @Override
     public void doDelete(String uuid, Object key) {
-        if ((int) key < 0) {
-            throw new NotExistStorageException(uuid);
-        }
         deallocateResume((int) key);
         count--;
     }
