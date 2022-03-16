@@ -1,6 +1,5 @@
 package com.eptitsyn.webapp.storage;
 
-import com.eptitsyn.webapp.exception.NotExistStorageException;
 import com.eptitsyn.webapp.exception.StorageException;
 import com.eptitsyn.webapp.model.Resume;
 
@@ -55,7 +54,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
 
     @Override
     public List<Resume> doGetAll() {
-        return new ArrayList<>(Arrays.asList(Arrays.copyOf(storage, size())));
+        return Arrays.asList(Arrays.copyOf(storage, size()));
     }
 
     protected abstract void deallocateResume(int index);

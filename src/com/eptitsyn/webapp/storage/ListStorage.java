@@ -31,7 +31,7 @@ public class ListStorage extends AbstractStorage {
 
     @Override
     protected void doDelete(String uuid, Object key) {
-        storage.remove(new Resume(uuid, ""));
+        storage.remove((int) key);
     }
 
     @Override

@@ -4,9 +4,14 @@ import com.eptitsyn.webapp.exception.ExistStorageException;
 import com.eptitsyn.webapp.exception.NotExistStorageException;
 import com.eptitsyn.webapp.model.Resume;
 
+import java.util.Comparator;
 import java.util.List;
 
 public abstract class AbstractStorage implements Storage {
+
+    public static final Comparator<Resume> RESUME_NAME_UUID_COMPARATOR = Comparator
+            .comparing(Resume::getFullName)
+            .thenComparing(Resume::getUuid);
 
     @Override
     public void update(Resume r) {
@@ -41,7 +46,7 @@ public abstract class AbstractStorage implements Storage {
     @Override
     public List<Resume> getAllSorted() {
         List<Resume> result = doGetAll();
-        result.sort(Resume.RESUME_NAME_UUID_COMPARATOR);
+        result.sort(RESUME_NAME_UUID_COMPARATOR);
         return result;
     }
 

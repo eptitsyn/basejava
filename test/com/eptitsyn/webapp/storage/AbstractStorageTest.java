@@ -16,7 +16,7 @@ abstract class AbstractStorageTest {
 
     protected static final int EXPECTED_SIZE = 5;
     protected final Storage storage;
-    protected final ArrayList<Resume> expectedResumes = new ArrayList<>();
+    protected final List<Resume> expectedResumes = new ArrayList<>();
 
     public AbstractStorageTest(Storage storage) {
         this.storage = storage;
@@ -91,8 +91,8 @@ abstract class AbstractStorageTest {
         List<Resume> actual = storage.getAllSorted();
         assertEquals(EXPECTED_SIZE, actual.size());
 
-        ArrayList<Resume> expected = expectedResumes;
-        expected.sort(Resume.RESUME_NAME_UUID_COMPARATOR);
+        List<Resume> expected = expectedResumes;
+        expected.sort(AbstractStorage.RESUME_NAME_UUID_COMPARATOR);
 
         assertEquals(expected, actual);
     }
