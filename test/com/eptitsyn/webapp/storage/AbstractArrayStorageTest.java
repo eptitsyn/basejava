@@ -18,9 +18,9 @@ abstract class AbstractArrayStorageTest extends AbstractStorageTest {
     void saveOverflow() {
         assertDoesNotThrow(() -> {
             for (int i = 0; i < (STORAGE_LIMIT - EXPECTED_SIZE); i++) {
-                storage.save(new Resume());
+                storage.save(new Resume("John Doe"));
             }
         });
-        assertThrows(StorageException.class, () -> storage.save(new Resume()));
+        assertThrows(StorageException.class, () -> storage.save(new Resume("John Doe")));
     }
 }

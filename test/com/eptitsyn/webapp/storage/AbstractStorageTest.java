@@ -8,15 +8,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 abstract class AbstractStorageTest {
+
     protected static final int EXPECTED_SIZE = 5;
     protected final Storage storage;
-    protected final Resume[] expectedResumes = new Resume[EXPECTED_SIZE];
+    protected final ArrayList<Resume> expectedResumes = new ArrayList<>();
 
     public AbstractStorageTest(Storage storage) {
         this.storage = storage;
@@ -26,9 +26,9 @@ abstract class AbstractStorageTest {
     void setUp() {
         storage.clear();
         for (int i = 0; i < EXPECTED_SIZE; i++) {
-            Resume r = new Resume();
+            Resume r = new Resume("John Doe");
             storage.save(r);
-            expectedResumes[i] = r;
+            expectedResumes.add(r);
         }
     }
 
@@ -41,18 +41,18 @@ abstract class AbstractStorageTest {
 
     @Test
     void update() {
-        storage.update(expectedResumes[3]);
-        assertSame(expectedResumes[3], storage.get(expectedResumes[3].getUuid()));
+        storage.update(expectedResumes.get(3));
+        assertSame(expectedResumes.get(3), storage.get(expectedResumes.get(3).getUuid()));
     }
 
     @Test
     void updateNotExisting() {
-        assertThrows(NotExistStorageException.class, () -> storage.update(new Resume()));
+        assertThrows(NotExistStorageException.class, () -> storage.update(new Resume("John Doe")));
     }
 
     @Test
     void save() {
-        Resume r = new Resume();
+        Resume r = new Resume("John Doe");
         storage.save(r);
         assertEquals(EXPECTED_SIZE + 1, storage.size());
         assertEquals(r, storage.get(r.getUuid()));
@@ -60,41 +60,40 @@ abstract class AbstractStorageTest {
 
     @Test
     void saveExists() {
-        assertThrows(ExistStorageException.class, () -> storage.save(expectedResumes[0]));
+        assertThrows(ExistStorageException.class, () -> storage.save(expectedResumes.get(0)));
     }
 
 
     @Test
     void get() {
-        assertEquals(expectedResumes[3], storage.get(expectedResumes[3].getUuid()));
+        assertEquals(expectedResumes.get(3), storage.get(expectedResumes.get(3).getUuid()));
     }
 
     @Test
     void getNotExist() {
-        assertThrows(StorageException.class, () -> storage.get(new Resume().getUuid()));
+        assertThrows(StorageException.class, () -> storage.get(new Resume("John Doe").getUuid()));
     }
 
     @Test
     void delete() {
-        storage.delete(expectedResumes[3].getUuid());
-        assertThrows(StorageException.class, () -> storage.get(expectedResumes[3].getUuid()));
-        assertEquals(storage.size(), EXPECTED_SIZE - 1);
+        storage.delete(expectedResumes.get(3).getUuid());
+        assertThrows(StorageException.class, () -> storage.get(expectedResumes.get(3).getUuid()));
+        assertEquals(EXPECTED_SIZE - 1, storage.size());
     }
 
     @Test
     void deleteNotExisting() {
-        assertThrows(NotExistStorageException.class, () -> storage.delete(new Resume().getUuid()));
+        assertThrows(NotExistStorageException.class, () -> storage.delete(new Resume("John Doe").getUuid()));
     }
 
     @Test
     void getAllSorted() {
         List<Resume> actual = storage.getAllSorted();
-        assertEquals(actual.size(), EXPECTED_SIZE);
+        assertEquals(EXPECTED_SIZE, actual.size());
 
-        List<Resume> expected = new ArrayList<>(Arrays.asList(expectedResumes));
-        expected.sort(Resume::compareTo);
+        ArrayList<Resume> expected = expectedResumes;
+        expected.sort(Resume.RESUME_NAME_UUID_COMPARATOR);
 
-        assertEquals(actual, expected);
-        assertNotSame(actual, expected);
+        assertEquals(expected, actual);
     }
 }

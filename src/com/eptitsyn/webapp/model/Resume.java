@@ -1,5 +1,6 @@
 package com.eptitsyn.webapp.model;
 
+import java.util.Comparator;
 import java.util.UUID;
 
 /**
@@ -7,22 +8,33 @@ import java.util.UUID;
  */
 public class Resume implements Comparable<Resume> {
 
-
     // Unique identifier
     private final String uuid;
 
     private String fullName;
 
-    public Resume() {
-        this(UUID.randomUUID().toString());
-    }
-
-    public Resume(String uuid) {
-        this(uuid, "");
+    public Resume(String fullName) {
+        this(UUID.randomUUID().toString(), fullName);
     }
 
     public Resume(String uuid, String fullName) {
         this.uuid = uuid;
+        this.fullName = fullName;
+    }
+
+    public static final Comparator<Resume> RESUME_NAME_UUID_COMPARATOR = Comparator
+            .comparing(Resume::getFullName)
+            .thenComparing(Resume::getUuid);
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setFullName(String fullName) {
         this.fullName = fullName;
     }
 
@@ -47,25 +59,7 @@ public class Resume implements Comparable<Resume> {
 
     @Override
     public int compareTo(Resume o) {
-        return compare(this, o);
-    }
-
-    public int compare(Resume o1, Resume o2) {
-        if (o1.getFullName() == null || o2.getFullName() == null || o1.getFullName().equals(o2.getFullName())) {
-            return o1.getUuid().compareTo(o2.getUuid());
-        }
-        return o1.getFullName().compareTo(o2.getFullName());
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+        Comparator<Resume> uuidComparator = Comparator.comparing(Resume::getUuid);
+        return uuidComparator.compare(this, o);
     }
 }

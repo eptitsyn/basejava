@@ -11,7 +11,7 @@ public class ListStorage extends AbstractStorage {
 
     @Override
     protected Object doGetSearchKey(String uuid) {
-        return storage.indexOf(new Resume(uuid));
+        return storage.indexOf(new Resume(uuid, ""));
     }
 
     @Override
@@ -31,7 +31,7 @@ public class ListStorage extends AbstractStorage {
 
     @Override
     protected void doDelete(String uuid, Object key) {
-        storage.remove(new Resume(uuid));
+        storage.remove(new Resume(uuid, ""));
     }
 
     @Override

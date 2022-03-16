@@ -55,7 +55,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
 
     @Override
     public List<Resume> doGetAll() {
-        return new ArrayList<>(Arrays.asList(storage));
+        return new ArrayList<>(Arrays.asList(Arrays.copyOf(storage, size())));
     }
 
     protected abstract void deallocateResume(int index);
