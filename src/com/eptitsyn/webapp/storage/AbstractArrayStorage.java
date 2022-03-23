@@ -60,5 +60,4 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     protected abstract void deallocateResume(int index);
 
     protected abstract void putResume(Resume resume, int index);
-
 }
