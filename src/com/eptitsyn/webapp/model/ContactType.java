@@ -7,14 +7,14 @@ public enum ContactType {
     GITHUB("GitHub"),
     OTHER("Др.");
 
-    private final String fieldDescription;
+    private final String description;
 
-    ContactType(String fieldDescription) {
-        this.fieldDescription = fieldDescription;
+    ContactType(String description) {
+        this.description = description;
     }
 
     @Override
     public String toString() {
-        return fieldDescription;
+        return description;
     }
 }

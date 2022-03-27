@@ -3,7 +3,7 @@ package com.eptitsyn.webapp.model;
 import java.util.List;
 
 public class StringListSection extends AbstractSection {
-    List<String> list;
+    private List<String> list;
 
     public StringListSection(List<String> list) {
         this.list = list;

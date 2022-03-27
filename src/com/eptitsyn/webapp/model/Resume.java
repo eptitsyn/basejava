@@ -1,6 +1,9 @@
 package com.eptitsyn.webapp.model;
 
-import java.util.*;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Initial resume class
@@ -10,9 +13,8 @@ public class Resume implements Comparable<Resume> {
     // Unique identifier
     private final String uuid;
     private String fullName;
-    private Map<SectionType, AbstractSection> sections = new HashMap<>();
-
-    private Map<ContactType, String> contacts = new HashMap<>();
+    private Map<SectionType, AbstractSection> sections = new EnumMap<>(SectionType.class);
+    private Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
 
     public Resume(String fullName) {
         this(UUID.randomUUID().toString(), fullName);
@@ -23,12 +25,12 @@ public class Resume implements Comparable<Resume> {
         this.fullName = fullName;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getContact(ContactType type) {
+        return contacts.get(type);
     }
 
-    public String getUuid() {
-        return uuid;
+    public String getFullName() {
+        return fullName;
     }
 
     public void setFullName(String fullName) {
@@ -39,34 +41,34 @@ public class Resume implements Comparable<Resume> {
         return sections.get(type);
     }
 
-    public void putSection(SectionType type, AbstractSection section) {
-        sections.put(type, section);
-    }
-
-    public List<AbstractSection> getAllSections() {
-        return sections.values().stream().toList();
-    }
-
-    public String getContact(ContactType type) {
-        return contacts.get(type);
-    }
-
     public void putContacts(ContactType type, String contact) {
         contacts.put(type, contact);
     }
 
+    public void putSection(SectionType type, AbstractSection section) {
+        sections.put(type, section);
+    }
+
+    @Override
+    public int compareTo(Resume o) {
+        return uuid.compareTo(o.getUuid());
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
     @Override
     public int hashCode() {
-        return uuid.hashCode();
+        return Objects.hash(uuid, fullName, sections, contacts);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Resume resume = (Resume) o;
-        return uuid.equals(resume.uuid);
+        return uuid.equals(resume.uuid) && Objects.equals(fullName, resume.fullName) && Objects.equals(sections, resume.sections) && Objects.equals(contacts, resume.contacts);
     }
 
     @Override
@@ -88,14 +90,9 @@ public class Resume implements Comparable<Resume> {
         StringBuilder builder = new StringBuilder();
 
         sections.forEach((key, value) -> {
-            builder.append("\n<h2>").append(key.toString()).append("</h2>\n");
-            builder.append(value.toString());
+            builder.append(key.toString()).append("\n");
+            builder.append(value.toString()).append("\n");
         });
         return builder.toString();
-    }
-
-    @Override
-    public int compareTo(Resume o) {
-        return uuid.compareTo(o.getUuid());
     }
 }

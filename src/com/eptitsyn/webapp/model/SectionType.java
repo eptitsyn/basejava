@@ -1,21 +1,21 @@
 package com.eptitsyn.webapp.model;
 
 public enum SectionType {
-    ACHIEVEMENTS("Достижения"),
-    EDUCATION("Образование"),
-    EXPERIENCE("Опыт"),
-    OBJECTIVE("Цель"),
     PERSONAL("Личные качества"),
-    QUALIFICATIONS("Квалификация");
+    OBJECTIVE("Цель"),
+    ACHIEVEMENTS("Достижения"),
+    QUALIFICATIONS("Квалификация"),
+    EXPERIENCE("Опыт"),
+    EDUCATION("Образование");
 
-    private final String fieldDescription;
+    private final String description;
 
-    SectionType(String fieldDescription) {
-        this.fieldDescription = fieldDescription;
+    SectionType(String description) {
+        this.description = description;
     }
 
     @Override
     public String toString() {
-        return fieldDescription;
+        return description;
     }
 }
