@@ -45,14 +45,14 @@ public class ResumeTestData {
         r.putSection(SectionType.EXPERIENCE, new Experience(qualificationRecords));
 
         Experience educationSection = new Experience(new ArrayList<>());
-        educationSection.addRecord(new Organisation(
+        educationSection.addOrganisation(new Organisation(
                 LocalDate.parse("2013-03-01"),
                 LocalDate.parse("2013-05-01"),
                 "Coursera",
                 "Functional Programming Principles in Scala\" by Martin Odersky",
                 new URL("https://coursera.org"))
         );
-        educationSection.addRecord(new Organisation(
+        educationSection.addOrganisation(new Organisation(
                 LocalDate.parse("2011-03-01"),
                 LocalDate.parse("2011-04-01"),
                 "Luxsoft",

@@ -9,7 +9,7 @@ public class Experience extends AbstractSection {
         this.list = list;
     }
 
-    public void addRecord(Organisation record) {
+    public void addOrganisation(Organisation record) {
         list.add(record);
     }
 
