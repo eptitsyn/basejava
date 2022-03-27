@@ -8,7 +8,7 @@ import com.eptitsyn.webapp.storage.ListStorage;
  * Test for your com.urise.webapp.storage.ArrayStorage implementation
  */
 public class MainTestArrayStorage {
-    static final AbstractStorage ARRAY_STORAGE = new ListStorage();
+    static final AbstractStorage<Integer> ARRAY_STORAGE = new ListStorage();
 
     public static void main(String[] args) {
         Resume r1 = new Resume("uuid1");

@@ -3,11 +3,10 @@ package com.eptitsyn.webapp.storage;
 import com.eptitsyn.webapp.exception.StorageException;
 import com.eptitsyn.webapp.model.Resume;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class AbstractArrayStorage extends AbstractStorage {
+public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
 
     protected static final int STORAGE_LIMIT = 10000;
     protected Resume[] storage = new Resume[STORAGE_LIMIT];
@@ -23,32 +22,32 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    public void doUpdate(Resume r, Object key) {
-        storage[(int) key] = r;
+    public void doUpdate(Resume r, Integer key) {
+        storage[key] = r;
     }
 
     @Override
-    protected boolean isExist(Object key) {
-        return (int) key >= 0;
+    protected boolean isExist(Integer key) {
+        return key >= 0;
     }
 
     @Override
-    protected void doSave(Resume r, Object key) {
+    protected void doSave(Resume r, Integer key) {
         if (count >= storage.length) {
             throw new StorageException("No free space for saving new resume" , r.getUuid());
         }
 
-        putResume(r, (int) key);
+        putResume(r, key);
         count++;
     }
 
-    public Resume doGet(String uuid, Object key) {
-        return storage[(int) key];
+    public Resume doGet(String uuid, Integer key) {
+        return storage[key];
     }
 
     @Override
-    public void doDelete(String uuid, Object key) {
-        deallocateResume((int) key);
+    public void doDelete(String uuid, Integer key) {
+        deallocateResume(key);
         count--;
     }
 

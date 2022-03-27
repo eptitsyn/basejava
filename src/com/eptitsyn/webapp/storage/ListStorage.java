@@ -5,12 +5,12 @@ import com.eptitsyn.webapp.model.Resume;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListStorage extends AbstractStorage {
+public class ListStorage extends AbstractStorage<Integer> {
 
     private final List<Resume> storage = new ArrayList<>();
 
     @Override
-    protected Object doGetSearchKey(String uuid) {
+    protected Integer doGetSearchKey(String uuid) {
         for (int i = 0; i < storage.size(); i++) {
             if (storage.get(i).getUuid().equals(uuid)){
                 return i;
@@ -20,28 +20,28 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected void doUpdate(Resume r, Object key) {
-        storage.set((int) key, r);
+    protected void doUpdate(Resume r, Integer key) {
+        storage.set(key, r);
     }
 
     @Override
-    protected void doSave(Resume r, Object key) {
+    protected void doSave(Resume r, Integer key) {
         storage.add(r);
     }
 
     @Override
-    protected Resume doGet(String uuid, Object key) {
-        return storage.get((int) key);
+    protected Resume doGet(String uuid, Integer key) {
+        return storage.get(key);
     }
 
     @Override
-    protected void doDelete(String uuid, Object key) {
-        storage.remove((int) key);
+    protected void doDelete(String uuid, Integer key) {
+        storage.remove(key.intValue());
     }
 
     @Override
-    protected boolean isExist(Object key) {
-        return (int) key != -1;
+    protected boolean isExist(Integer key) {
+        return key != -1;
     }
 
     @Override
