@@ -7,9 +7,12 @@ import com.eptitsyn.webapp.model.Resume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import static com.eptitsyn.webapp.ResumeTestData.generateTestResume;
 import static org.junit.jupiter.api.Assertions.*;
 
 abstract class AbstractStorageTest {
@@ -23,10 +26,10 @@ abstract class AbstractStorageTest {
     }
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws MalformedURLException {
         storage.clear();
         for (int i = 0; i < EXPECTED_SIZE; i++) {
-            Resume r = new Resume("John Doe");
+            Resume r = generateTestResume(UUID.randomUUID().toString(), "John Doe");
             storage.save(r);
             expectedResumes.add(r);
         }
@@ -71,7 +74,7 @@ abstract class AbstractStorageTest {
 
     @Test
     void getNotExist() {
-        assertThrows(StorageException.class, () -> storage.get(new Resume("John Doe").getUuid()));
+        assertThrows(StorageException.class, () -> storage.get(UUID.randomUUID().toString()));
     }
 
     @Test
@@ -83,7 +86,7 @@ abstract class AbstractStorageTest {
 
     @Test
     void deleteNotExisting() {
-        assertThrows(NotExistStorageException.class, () -> storage.delete(new Resume("John Doe").getUuid()));
+        assertThrows(NotExistStorageException.class, () -> storage.delete(UUID.randomUUID().toString()));
     }
 
     @Test
