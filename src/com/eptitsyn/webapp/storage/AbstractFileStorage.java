@@ -5,8 +5,7 @@ import com.eptitsyn.webapp.exception.NotExistStorageException;
 import com.eptitsyn.webapp.exception.StorageException;
 import com.eptitsyn.webapp.model.Resume;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -52,23 +51,27 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
             if (!file.createNewFile()) {
                 throw new IOException("Can not create file");
             }
-            doWrite(resume, file);
+            doUpdate(resume, file);
         } catch (IOException e) {
             throw new StorageException("IOError", file.getName(), e);
         }
     }
 
-    protected abstract void doWrite(Resume resume, File file) throws IOException;
+    protected abstract void doWrite(Resume resume, OutputStream file) throws IOException;
 
     @Override
     protected Resume doGet(String uuid, File file) {
         if (!file.exists()) {
             throw new NotExistStorageException(uuid);
         }
-        return doRead(file);
+        try {
+            return doRead(new BufferedInputStream(new FileInputStream(file)));
+        } catch (IOException e) {
+            throw new StorageException("File read error", file.getName(), e);
+        }
     }
 
-    protected abstract Resume doRead(File file);
+    protected abstract Resume doRead(InputStream file);
 
     @Override
     protected void doDelete(String uuid, File file) {
@@ -87,7 +90,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         List<Resume> resumes = new ArrayList<>();
         if (files != null) {
             for (File file : files) {
-                resumes.add(doRead(file));
+                resumes.add(doGet(file.getName(), file));
             }
         }
         return resumes;
@@ -99,9 +102,9 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
             throw new NotExistStorageException(r.getUuid());
         }
         try {
-            doWrite(r, file);
+            doWrite(r, new BufferedOutputStream(new FileOutputStream(file)));
         } catch (IOException e) {
-            throw new StorageException("Can't update. IOError", file.getName(), e);
+             throw new StorageException("Can't update. IOError", file.getName(), e);
         }
     }
 

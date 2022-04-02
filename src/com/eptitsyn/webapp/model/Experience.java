@@ -1,29 +1,45 @@
 package com.eptitsyn.webapp.model;
 
-import com.sun.istack.internal.NotNull;
-
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class Experience extends AbstractSection {
-    private List<Organisation> organisationList;
+    private final List<Organisation> organisations;
 
-    public Experience(List<Organisation> organisationList) {
-        Objects.requireNonNull(organisationList, "Organisation list can't br null");
-        this.organisationList = organisationList;
+    public Experience(List<Organisation> organisations) {
+        Objects.requireNonNull(organisations, "Organisation list can't br null");
+        this.organisations = organisations;
+    }
+
+    public Experience(Organisation... organisations) {
+        this(Arrays.asList(organisations));
     }
 
     public void addOrganisation(Organisation record) {
-        organisationList.add(record);
+        organisations.add(record);
     }
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Organisation organisation : organisationList) {
+        for (Organisation organisation : organisations) {
             stringBuilder.append(organisation.toString()).append('\n');
         }
         return stringBuilder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Experience that = (Experience) o;
+        return organisations.equals(that.organisations);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(organisations);
     }
 }
 

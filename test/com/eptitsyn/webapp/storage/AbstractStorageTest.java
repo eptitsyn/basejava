@@ -7,6 +7,7 @@ import com.eptitsyn.webapp.model.Resume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import static com.eptitsyn.webapp.ResumeTestData.generateTestResume;
 import static org.junit.jupiter.api.Assertions.*;
 
 abstract class AbstractStorageTest {
+    protected static final File STORAGE_DIR = new File("/Users/ep/Documents/dev/java-ops/basejava/storage");
 
     protected static final int EXPECTED_SIZE = 5;
     protected final Storage storage;
@@ -69,7 +71,9 @@ abstract class AbstractStorageTest {
 
     @Test
     void get() {
-        assertEquals(expectedResumes.get(3), storage.get(expectedResumes.get(3).getUuid()));
+        Resume expected = expectedResumes.get(3);
+        Resume actual = storage.get(expected.getUuid());
+        assertEquals(expected, actual);
     }
 
     @Test

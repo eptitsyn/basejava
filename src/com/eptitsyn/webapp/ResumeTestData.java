@@ -30,53 +30,47 @@ public class ResumeTestData {
 
                 List<Organisation> qualificationRecords = Arrays.asList(
                 new Organisation(
-                        Arrays.asList(new Position(
+                        "Luxsoft", new URL("https://luxsoft.com"), Arrays.asList(new Organisation.Position(
                                 LocalDate.now().minusYears(5),
                                 LocalDate.now().minusYears(4),
                                 "Junior developer",
                                 "Some job description"),
-                                new Position(
+                                new Organisation.Position(
                                         LocalDate.now().minusYears(4),
                                         LocalDate.now().minusYears(3),
                                         "Middle developer",
                                         "Some another job description")
-                        ),
-                        "Luxsoft",
-                        new URL("https://luxsoft.com")
+                        )
                 ),
                         new Organisation(
-                                Arrays.asList(new Position(
+                                "Yota", new URL("https://yota.ru"), Arrays.asList(new Organisation.Position(
                                                 LocalDate.now().minusYears(3),
                                                 LocalDate.now().minusYears(2),
                                                 "Middle developer",
                                                 "Some job description"),
-                                        new Position(
+                                        new Organisation.Position(
                                                 LocalDate.now().minusYears(2),
                                                 LocalDate.now().minusYears(1),
                                                 "Senior developer",
                                                 "Some another job description")
-                                ),
-                                "Yota",
-                                new URL("https://yota.ru")
+                                )
                         )
         );
         resume.putSection(SectionType.EXPERIENCE, new Experience(qualificationRecords));
 
         Experience educationSection = new Experience(Arrays.asList(
-                new Organisation(Collections.singletonList(
-                        new Position(
+                new Organisation("Coursera", new URL("https://coursera.org"), Collections.singletonList(
+                        new Organisation.Position(
                                 LocalDate.parse("2013-03-01"),
                                 LocalDate.parse("2013-05-01"),
                                 "\"Functional Programming Principles in Scala\" by Martin Odersky", ""))
-                        , "Coursera",
-                        new URL("https://coursera.org")),
-                new Organisation(Collections.singletonList(
-                        new Position(
+                ),
+                new Organisation("Luxsoft", new URL("https://luxsoft.com"), Collections.singletonList(
+                        new Organisation.Position(
                                 LocalDate.parse("2011-03-01"),
                                 LocalDate.parse("2011-04-01"),
                                 "Курс \"Объектно-ориентированный анализ ИС. Концептуальное моделирование на UML.\"", ""))
-                        , "Luxsoft",
-                        new URL("https://luxsoft.com"))
+                )
         ));
 
         resume.putSection(SectionType.EDUCATION, educationSection);
@@ -92,5 +86,6 @@ public class ResumeTestData {
 
         Resume r = generateTestResume(UUID.randomUUID().toString(), "James Bond");
         System.out.println(r);
+        }
     }
 }

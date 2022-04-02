@@ -25,3 +25,4 @@ hs_err_pid*
 basejava.iml
 .DS_Store
 lib/
+storage/
