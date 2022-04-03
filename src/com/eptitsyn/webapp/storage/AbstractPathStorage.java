@@ -102,7 +102,7 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
         return resumes;
     }
 
-    protected abstract Resume doRead(InputStream file);
+    protected abstract Resume doRead(InputStream file) throws IOException;
 
     @Override
     protected void doUpdate(Resume r, Path file) {

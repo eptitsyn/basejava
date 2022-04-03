@@ -5,6 +5,7 @@ import com.eptitsyn.webapp.storage.serializer.ObjectStreamSerializer;
 import com.eptitsyn.webapp.storage.serializer.Serializer;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -19,12 +20,12 @@ public class ObjectStreamFileStorage extends AbstractFileStorage {
     }
 
     @Override
-    protected void doWrite(Resume resume, OutputStream os) {
+    protected void doWrite(Resume resume, OutputStream os) throws IOException {
         serializer.serialize(resume, os);
     }
 
     @Override
-    protected Resume doRead(InputStream is) {
+    protected Resume doRead(InputStream is) throws IOException {
         return serializer.deserialize(is);
     }
 }

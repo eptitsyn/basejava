@@ -6,6 +6,9 @@ public class StringSection extends AbstractSection {
     private static final long serialVersionUID = 1L;
     private String text;
 
+    public StringSection() {
+    }
+
     public StringSection(String text) {
         this.text = text;
     }
@@ -15,8 +18,8 @@ public class StringSection extends AbstractSection {
     }
 
     @Override
-    public String toString() {
-        return  text + '\n';
+    public int hashCode() {
+        return Objects.hash(text);
     }
 
     @Override
@@ -28,7 +31,7 @@ public class StringSection extends AbstractSection {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(text);
+    public String toString() {
+        return text + '\n';
     }
 }

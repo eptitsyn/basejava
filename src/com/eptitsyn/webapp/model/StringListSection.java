@@ -6,7 +6,10 @@ import java.util.Objects;
 
 public class StringListSection extends AbstractSection {
     private static final long serialVersionUID = 1L;
-    private final List<String> list;
+    private List<String> list;
+
+    public StringListSection() {
+    }
 
     public StringListSection(String... items) {
         this(Arrays.asList(items));

@@ -7,7 +7,10 @@ import java.util.Objects;
 public class Experience extends AbstractSection {
     private static final long serialVersionUID = 1L;
 
-    private final List<Organisation> organisations;
+    private List<Organisation> organisations;
+
+    public Experience() {
+    }
 
     public Experience(Organisation... organisations) {
         this(Arrays.asList(organisations));
