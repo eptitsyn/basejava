@@ -2,13 +2,19 @@ package com.eptitsyn.webapp.storage;
 
 import com.eptitsyn.webapp.model.Resume;
 import com.eptitsyn.webapp.storage.serializer.ObjectStreamSerializer;
+import com.eptitsyn.webapp.storage.serializer.Serializer;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
 public class ObjectStreamPathStorage extends AbstractPathStorage {
-    protected ObjectStreamPathStorage(String dir) {
-        super(dir, new ObjectStreamSerializer());
+
+    public ObjectStreamPathStorage(String dir, Serializer serializer) {
+        super(dir, serializer);
+    }
+
+    public ObjectStreamPathStorage(String dir) {
+        this(dir, new ObjectStreamSerializer());
     }
 
     @Override
