@@ -4,6 +4,7 @@ import com.eptitsyn.webapp.exception.ExistStorageException;
 import com.eptitsyn.webapp.exception.NotExistStorageException;
 import com.eptitsyn.webapp.exception.StorageException;
 import com.eptitsyn.webapp.model.Resume;
+import com.eptitsyn.webapp.storage.serializer.Serializer;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -12,10 +13,13 @@ import java.util.Objects;
 
 public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
+    protected final Serializer serializer;
     private final File directory;
 
-    protected AbstractFileStorage(File directory) {
+    protected AbstractFileStorage(File directory, Serializer serializer) {
         Objects.requireNonNull(directory, "directory should not be null");
+        Objects.requireNonNull(serializer, "seralizer must not be null");
+        this.serializer = serializer;
         if (!directory.isDirectory()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not a directory");
         }
@@ -71,8 +75,6 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         }
     }
 
-    protected abstract Resume doRead(InputStream file);
-
     @Override
     protected void doDelete(String uuid, File file) {
         if (!file.exists()) {
@@ -96,6 +98,8 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         return resumes;
     }
 
+    protected abstract Resume doRead(InputStream file);
+
     @Override
     protected void doUpdate(Resume r, File file) {
         if (!file.exists()) {
@@ -104,7 +108,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         try {
             doWrite(r, new BufferedOutputStream(new FileOutputStream(file)));
         } catch (IOException e) {
-             throw new StorageException("Can't update. IOError", file.getName(), e);
+            throw new StorageException("Can't update. IOError", file.getName(), e);
         }
     }
 
