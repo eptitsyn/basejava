@@ -17,7 +17,7 @@ import static com.eptitsyn.webapp.ResumeTestData.generateTestResume;
 import static org.junit.jupiter.api.Assertions.*;
 
 abstract class AbstractStorageTest {
-    protected static final File STORAGE_DIR = new File("/Users/ep/Documents/dev/java-ops/basejava/storage");
+    protected static final String STORAGE_DIR = "/Users/ep/Documents/dev/java-ops/basejava/storage";
 
     protected static final int EXPECTED_SIZE = 5;
     protected final Storage storage;

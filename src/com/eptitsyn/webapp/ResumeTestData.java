@@ -86,6 +86,6 @@ public class ResumeTestData {
 
         Resume r = generateTestResume(UUID.randomUUID().toString(), "James Bond");
         System.out.println(r);
-        }
     }
 }
+

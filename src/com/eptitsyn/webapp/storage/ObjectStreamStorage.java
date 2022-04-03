@@ -6,8 +6,8 @@ import com.eptitsyn.webapp.model.Resume;
 import java.io.*;
 
 public class ObjectStreamStorage extends AbstractFileStorage {
-    protected ObjectStreamStorage(File directory) {
-        super(directory);
+    protected ObjectStreamStorage(String directory) {
+        super(new File(directory));
     }
 
     @Override
