@@ -14,18 +14,18 @@ import java.util.Objects;
 import static com.eptitsyn.webapp.util.DateUtil.NOW;
 
 public class Organisation implements Serializable {
-    private List<Position> positions = new ArrayList<>();
     private final String name;
     private final URL website;
+    private List<Position> positions = new ArrayList<>();
+
+    public Organisation(String name, URL website, Position... positions) {
+        this(name, website, Arrays.asList(positions));
+    }
 
     public Organisation(String name, URL website, List<Position> positions) {
         this.positions = positions;
         this.name = name;
         this.website = website;
-    }
-
-    public Organisation(String name, URL website, Position... positions) {
-        this(name, website, Arrays.asList(positions));
     }
 
     public void addPosition(Position position) {
@@ -45,6 +45,19 @@ public class Organisation implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(name, website);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Organisation that = (Organisation) o;
+        return name.equals(that.name) && Objects.equals(website, that.website);
+    }
+
+    @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         for (Position position : positions) {
@@ -61,34 +74,23 @@ public class Organisation implements Serializable {
         return stringBuilder.toString();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Organisation that = (Organisation) o;
-        return name.equals(that.name) && Objects.equals(website, that.website);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, website);
-    }
-
     public static class Position implements Serializable {
+        private static final long serialVersionUID = 1L;
+
         private final LocalDate startDate;
         private final LocalDate endDate;
         private final String title;
         private final String description;
+
+        public Position(int startYear, Month startMonth, String title, String description) {
+            this(DateUtil.of(startYear, startMonth), NOW, title, description);
+        }
 
         public Position(LocalDate startDate, LocalDate endDate, String title, String description) {
             this.startDate = startDate;
             this.endDate = endDate;
             this.title = title;
             this.description = description;
-        }
-
-        public Position(int startYear, Month startMonth, String title, String description){
-            this(DateUtil.of(startYear,startMonth), NOW, title, description);
         }
 
         public String getDescription() {
@@ -108,11 +110,8 @@ public class Organisation implements Serializable {
         }
 
         @Override
-        public String toString() {
-            return "" + startDate +
-                    " - " + endDate +
-                    " " + title + '\n' +
-                    "" + description + '\n';
+        public int hashCode() {
+            return Objects.hash(startDate, endDate, title, description);
         }
 
         @Override
@@ -124,8 +123,11 @@ public class Organisation implements Serializable {
         }
 
         @Override
-        public int hashCode() {
-            return Objects.hash(startDate, endDate, title, description);
+        public String toString() {
+            return "" + startDate +
+                    " - " + endDate +
+                    " " + title + '\n' +
+                    "" + description + '\n';
         }
     }
 }

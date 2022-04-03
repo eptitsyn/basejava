@@ -3,6 +3,7 @@ package com.eptitsyn.webapp.model;
 import java.util.Objects;
 
 public class StringSection extends AbstractSection {
+    private static final long serialVersionUID = 1L;
     private String text;
 
     public StringSection(String text) {

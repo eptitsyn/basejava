@@ -5,15 +5,17 @@ import java.util.List;
 import java.util.Objects;
 
 public class Experience extends AbstractSection {
+    private static final long serialVersionUID = 1L;
+
     private final List<Organisation> organisations;
+
+    public Experience(Organisation... organisations) {
+        this(Arrays.asList(organisations));
+    }
 
     public Experience(List<Organisation> organisations) {
         Objects.requireNonNull(organisations, "Organisation list can't br null");
         this.organisations = organisations;
-    }
-
-    public Experience(Organisation... organisations) {
-        this(Arrays.asList(organisations));
     }
 
     public void addOrganisation(Organisation record) {
@@ -21,12 +23,8 @@ public class Experience extends AbstractSection {
     }
 
     @Override
-    public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (Organisation organisation : organisations) {
-            stringBuilder.append(organisation.toString()).append('\n');
-        }
-        return stringBuilder.toString();
+    public int hashCode() {
+        return Objects.hash(organisations);
     }
 
     @Override
@@ -38,8 +36,12 @@ public class Experience extends AbstractSection {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(organisations);
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Organisation organisation : organisations) {
+            stringBuilder.append(organisation.toString()).append('\n');
+        }
+        return stringBuilder.toString();
     }
 }
 

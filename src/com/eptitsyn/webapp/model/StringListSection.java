@@ -5,24 +5,21 @@ import java.util.List;
 import java.util.Objects;
 
 public class StringListSection extends AbstractSection {
+    private static final long serialVersionUID = 1L;
     private final List<String> list;
+
+    public StringListSection(String... items) {
+        this(Arrays.asList(items));
+    }
 
     public StringListSection(List<String> list) {
         Objects.requireNonNull(list);
         this.list = list;
     }
 
-    public StringListSection(String... items) {
-        this(Arrays.asList(items));
-    }
-
     @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        for (String s : list) {
-            builder.append(" * ").append(s).append("\n");
-        }
-        return builder.toString();
+    public int hashCode() {
+        return Objects.hash(list);
     }
 
     @Override
@@ -34,7 +31,11 @@ public class StringListSection extends AbstractSection {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(list);
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (String s : list) {
+            builder.append(" * ").append(s).append("\n");
+        }
+        return builder.toString();
     }
 }
