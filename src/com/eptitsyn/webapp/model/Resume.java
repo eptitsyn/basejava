@@ -16,12 +16,11 @@ import java.util.UUID;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Resume implements Comparable<Resume>, Serializable {
     private static final long serialVersionUID = 1L;
-
+    private final Map<SectionType, AbstractSection> sections = new EnumMap<>(SectionType.class);
+    private final Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
     // Unique identifier
     private String uuid;
     private String fullName;
-    private final Map<SectionType, AbstractSection> sections = new EnumMap<>(SectionType.class);
-    private final Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
 
     public Resume() {}
 
@@ -38,6 +37,14 @@ public class Resume implements Comparable<Resume>, Serializable {
         return contacts.get(type);
     }
 
+    public void addContact(ContactType type, String value) {
+        contacts.put(type, value);
+    }
+
+    public Map<ContactType, String> getContacts() {
+        return contacts;
+    }
+
     public String getFullName() {
         return fullName;
     }
@@ -48,6 +55,10 @@ public class Resume implements Comparable<Resume>, Serializable {
 
     public AbstractSection getSection(SectionType type) {
         return sections.get(type);
+    }
+
+    public Map<SectionType, AbstractSection> getSections() {
+        return sections;
     }
 
     public void putContacts(ContactType type, String contact) {
@@ -68,16 +79,16 @@ public class Resume implements Comparable<Resume>, Serializable {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(uuid, fullName, sections, contacts);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Resume resume = (Resume) o;
         return uuid.equals(resume.uuid) && Objects.equals(fullName, resume.fullName) && Objects.equals(sections, resume.sections) && Objects.equals(contacts, resume.contacts);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(uuid, fullName, sections, contacts);
     }
 
     @Override
