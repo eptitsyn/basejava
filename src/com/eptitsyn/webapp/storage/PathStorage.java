@@ -14,12 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class AbstractPathStorage extends AbstractStorage<Path> {
+public class PathStorage extends AbstractStorage<Path> {
 
     protected final Serializer serializer;
     private final Path directory;
 
-    protected AbstractPathStorage(String dir, Serializer serializer) {
+    protected PathStorage(String dir, Serializer serializer) {
         Objects.requireNonNull(dir, "directory should not be null");
         Objects.requireNonNull(serializer);
         directory = Paths.get(dir);
@@ -65,7 +65,6 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
         }
     }
 
-    protected abstract void doWrite(Resume resume, OutputStream file) throws IOException;
 
     @Override
     protected Resume doGet(String uuid, Path file) {
@@ -73,7 +72,7 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
             throw new NotExistStorageException(uuid);
         }
         try {
-            return doRead(new BufferedInputStream(new FileInputStream(file.toString())));
+            return serializer.deserialize(new BufferedInputStream(new FileInputStream(file.toString())));
         } catch (IOException e) {
             throw new StorageException("File read error", file.getFileName().toString(), e);
         }
@@ -102,7 +101,6 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
         return resumes;
     }
 
-    protected abstract Resume doRead(InputStream file);
 
     @Override
     protected void doUpdate(Resume r, Path file) {
@@ -110,7 +108,7 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
             throw new NotExistStorageException(r.getUuid());
         }
         try {
-            doWrite(r, new BufferedOutputStream(new FileOutputStream(file.toString())));
+            serializer.serialize(r, new BufferedOutputStream(new FileOutputStream(file.toString())));
         } catch (IOException e) {
             throw new StorageException("Can't update. IOError", file.getFileName().toString(), e);
         }
