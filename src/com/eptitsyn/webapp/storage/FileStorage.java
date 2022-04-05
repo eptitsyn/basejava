@@ -31,19 +31,24 @@ public class FileStorage extends AbstractStorage<File> {
 
     @Override
     public void clear() {
-        File[] files = directory.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (!file.delete()) {
-                    throw new StorageException("Can't delete ", file.getName());
-                }
+        for (File file : getDirectoryListFiles()) {
+            if (!file.delete()) {
+                throw new StorageException("Can't delete ", file.getName());
             }
         }
     }
 
+    private File[] getDirectoryListFiles() {
+        File[] dir = directory.listFiles();
+        if (dir == null) {
+            throw new StorageException("Can't read directory", directory.getAbsolutePath());
+        }
+        return dir;
+    }
+
     @Override
     public int size() {
-        return Objects.requireNonNull(directory.listFiles()).length;
+        return getDirectoryListFiles().length;
     }
 
     @Override
@@ -79,20 +84,16 @@ public class FileStorage extends AbstractStorage<File> {
         if (!file.exists()) {
             throw new NotExistStorageException(uuid);
         }
-        if (file.delete()) {
-            return;
+        if (!file.delete()) {
+            throw new StorageException("Can't delete ", uuid);
         }
-        throw new StorageException("Can't delete ", uuid);
     }
 
     @Override
     protected List<Resume> doGetAll() {
-        File[] files = directory.listFiles();
         List<Resume> resumes = new ArrayList<>();
-        if (files != null) {
-            for (File file : files) {
-                resumes.add(doGet(file.getName(), file));
-            }
+        for (File file : getDirectoryListFiles()) {
+            resumes.add(doGet(file.getName(), file));
         }
         return resumes;
     }
