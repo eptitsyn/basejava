@@ -2,7 +2,7 @@ package com.eptitsyn.webapp.model;
 
 public enum ContactType {
     PHONE("Тел."),
-    EMAIL("e-mail"),
+    EMAIL("E-mail"),
     SKYPE("Skype"),
     GITHUB("GitHub"),
     OTHER("Др.");

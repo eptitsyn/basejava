@@ -63,13 +63,13 @@ public class ResumeTestData {
                         new Organisation.Position(
                                 LocalDate.parse("2013-03-01"),
                                 LocalDate.parse("2013-05-01"),
-                                "\"Functional Programming Principles in Scala\" by Martin Odersky", ""))
+                                "\"Functional Programming Principles in Scala\" by Martin Odersky", " "))
                 ),
                 new Organisation("Luxsoft", new URL("https://luxsoft.com"), Collections.singletonList(
                         new Organisation.Position(
                                 LocalDate.parse("2011-03-01"),
                                 LocalDate.parse("2011-04-01"),
-                                "Курс \"Объектно-ориентированный анализ ИС. Концептуальное моделирование на UML.\"", ""))
+                                "Курс \"Объектно-ориентированный анализ ИС. Концептуальное моделирование на UML.\"", " "))
                 )
         ));
 
