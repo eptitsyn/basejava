@@ -5,7 +5,6 @@ import com.eptitsyn.webapp.exception.NotExistStorageException;
 import com.eptitsyn.webapp.exception.StorageException;
 import com.eptitsyn.webapp.model.Resume;
 import com.eptitsyn.webapp.storage.serializer.Serializer;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -19,108 +18,108 @@ import java.util.stream.Stream;
 
 public class PathStorage extends AbstractStorage<Path> {
 
-    protected final Serializer serializer;
-    private final Path directory;
+  protected final Serializer serializer;
+  private final Path directory;
 
-    protected PathStorage(String dir, Serializer serializer) {
-        Objects.requireNonNull(dir, "directory should not be null");
-        Objects.requireNonNull(serializer);
-        directory = Paths.get(dir);
-        this.serializer = serializer;
-        if (!Files.isDirectory(directory)) {
-            throw new IllegalArgumentException(directory.toAbsolutePath() + " is not a directory");
-        }
-        if (!Files.isReadable(directory) || !Files.isWritable(directory)) {
-            throw new IllegalArgumentException(directory.toAbsolutePath() + " is not readable/writable");
-        }
+  protected PathStorage(String dir, Serializer serializer) {
+    Objects.requireNonNull(dir, "directory should not be null");
+    Objects.requireNonNull(serializer);
+    directory = Paths.get(dir);
+    this.serializer = serializer;
+    if (!Files.isDirectory(directory)) {
+      throw new IllegalArgumentException(directory.toAbsolutePath() + " is not a directory");
     }
+    if (!Files.isReadable(directory) || !Files.isWritable(directory)) {
+      throw new IllegalArgumentException(directory.toAbsolutePath() + " is not readable/writable");
+    }
+  }
 
-    @Override
-    public void clear() {
-        getDirectoryList().forEach(this::doDelete);
-    }
+  @Override
+  public void clear() {
+    getDirectoryList().forEach(this::doDelete);
+  }
 
-    @Override
-    public int size() {
-        return (int) getDirectoryList().count();
-    }
+  @Override
+  public int size() {
+    return (int) getDirectoryList().count();
+  }
 
-    private Stream<Path> getDirectoryList() {
-        try {
-            return Files.list(directory);
-        } catch (IOException e) {
-            throw new StorageException("Directory reading error", null);
-        }
+  @Override
+  protected void doSave(Resume resume, Path file) {
+    if (isExist(file)) {
+      throw new ExistStorageException(resume.getUuid());
     }
+    try {
+      Files.createFile(file);
+      doUpdate(resume, file);
+    } catch (IOException e) {
+      throw new StorageException("IOError", file.toString(), e);
+    }
+  }
 
-    private void doDelete(Path file) {
-        this.doDelete(file.getFileName().toString(), file);
+  @Override
+  protected Resume doGet(String uuid, Path file) {
+    if (!isExist(file)) {
+      throw new NotExistStorageException(uuid);
     }
+    try {
+      return serializer.deserialize(new BufferedInputStream(Files.newInputStream(file)));
+    } catch (IOException e) {
+      throw new StorageException("File read error", file.getFileName().toString(), e);
+    }
+  }
 
-    @Override
-    protected void doSave(Resume resume, Path file) {
-        if (isExist(file)) {
-            throw new ExistStorageException(resume.getUuid());
-        }
-        try {
-            Files.createFile(file);
-            doUpdate(resume, file);
-        } catch (IOException e) {
-            throw new StorageException("IOError", file.toString(), e);
-        }
+  @Override
+  protected void doDelete(String uuid, Path file) {
+    if (!isExist(file)) {
+      throw new NotExistStorageException(uuid);
     }
+    try {
+      Files.delete(file);
+    } catch (IOException e) {
+      throw new StorageException("Can't delete ", uuid);
+    }
+  }
 
-    @Override
-    protected Resume doGet(String uuid, Path file) {
-        if (!isExist(file)) {
-            throw new NotExistStorageException(uuid);
-        }
-        try {
-            return serializer.deserialize(new BufferedInputStream(Files.newInputStream(file)));
-        } catch (IOException e) {
-            throw new StorageException("File read error", file.getFileName().toString(), e);
-        }
-    }
+  @Override
+  protected List<Resume> doGetAll() {
+    Stream<Path> files = getDirectoryList();
+    List<Resume> resumes = new ArrayList<>();
+    files.forEach(file -> resumes.add(doGet(file.getFileName().toString(), file)));
+    return resumes;
+  }
 
-    @Override
-    protected void doDelete(String uuid, Path file) {
-        if (!isExist(file)) {
-            throw new NotExistStorageException(uuid);
-        }
-        try {
-            Files.delete(file);
-        } catch (IOException e) {
-            throw new StorageException("Can't delete ", uuid);
-        }
+  @Override
+  protected void doUpdate(Resume r, Path file) {
+    if (!isExist(file)) {
+      throw new NotExistStorageException(r.getUuid());
     }
+    try {
+      serializer.serialize(r, new BufferedOutputStream(Files.newOutputStream(file)));
+    } catch (IOException e) {
+      throw new StorageException("Can't update. IOError", file.getFileName().toString(), e);
+    }
+  }
 
-    @Override
-    protected List<Resume> doGetAll() {
-        Stream<Path> files = getDirectoryList();
-        List<Resume> resumes = new ArrayList<>();
-        files.forEach(file -> resumes.add(doGet(file.getFileName().toString(), file)));
-        return resumes;
-    }
+  @Override
+  protected Path doGetSearchKey(String uuid) {
+    return directory.resolve(uuid);
+  }
 
-    @Override
-    protected void doUpdate(Resume r, Path file) {
-        if (!isExist(file)) {
-            throw new NotExistStorageException(r.getUuid());
-        }
-        try {
-            serializer.serialize(r, new BufferedOutputStream(Files.newOutputStream(file)));
-        } catch (IOException e) {
-            throw new StorageException("Can't update. IOError", file.getFileName().toString(), e);
-        }
-    }
+  @Override
+  protected boolean isExist(Path file) {
+    return Files.exists(file);
+  }
 
-    @Override
-    protected Path doGetSearchKey(String uuid) {
-        return directory.resolve(uuid);
+  private Stream<Path> getDirectoryList() {
+    try {
+      return Files.list(directory);
+    } catch (IOException e) {
+      throw new StorageException("Directory reading error", null);
     }
+  }
 
-    @Override
-    protected boolean isExist(Path file) {
-        return Files.exists(file);
-    }
+  private void doDelete(Path file) {
+    this.doDelete(file.getFileName().toString(), file);
+  }
 }

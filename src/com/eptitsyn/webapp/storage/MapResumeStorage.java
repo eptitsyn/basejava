@@ -1,57 +1,57 @@
 package com.eptitsyn.webapp.storage;
 
 import com.eptitsyn.webapp.model.Resume;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MapResumeStorage extends AbstractStorage<Resume> {
-    final Map<String, Resume> storage = new HashMap<>();
 
-    @Override
-    public void clear() {
-        storage.clear();
-    }
+  final Map<String, Resume> storage = new HashMap<>();
 
-    @Override
-    public int size() {
-        return storage.size();
-    }
+  @Override
+  public void clear() {
+    storage.clear();
+  }
 
-    @Override
-    protected void doSave(Resume r, Resume key) {
-        storage.put(r.getUuid(), r);
-    }
+  @Override
+  public int size() {
+    return storage.size();
+  }
 
-    @Override
-    protected Resume doGet(String uuid, Resume key) {
-        return key;
-    }
+  @Override
+  protected void doSave(Resume r, Resume key) {
+    storage.put(r.getUuid(), r);
+  }
 
-    @Override
-    protected void doDelete(String uuid, Resume key) {
-        storage.remove(uuid);
-    }
+  @Override
+  protected Resume doGet(String uuid, Resume key) {
+    return key;
+  }
 
-    @Override
-    public List<Resume> doGetAll() {
-        return new ArrayList<>(storage.values());
-    }
+  @Override
+  protected void doDelete(String uuid, Resume key) {
+    storage.remove(uuid);
+  }
 
-    @Override
-    protected void doUpdate(Resume r, Resume key) {
-        storage.replace(r.getUuid(), r);
-    }
+  @Override
+  public List<Resume> doGetAll() {
+    return new ArrayList<>(storage.values());
+  }
 
-    @Override
-    protected Resume doGetSearchKey(String uuid) {
-        return storage.get(uuid);
-    }
+  @Override
+  protected void doUpdate(Resume r, Resume key) {
+    storage.replace(r.getUuid(), r);
+  }
 
-    @Override
-    protected boolean isExist(Resume key) {
-        return key != null;
-    }
+  @Override
+  protected Resume doGetSearchKey(String uuid) {
+    return storage.get(uuid);
+  }
+
+  @Override
+  protected boolean isExist(Resume key) {
+    return key != null;
+  }
 }
