@@ -22,13 +22,12 @@ public class Experience extends AbstractSection {
     this.organisations = organisations;
   }
 
-  public void addOrganisation(Organisation record) {
-    organisations.add(record);
+  public List<Organisation> getOrganisations() {
+    return organisations;
   }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(organisations);
+  public void addOrganisation(Organisation record) {
+    organisations.add(record);
   }
 
   @Override
@@ -41,6 +40,11 @@ public class Experience extends AbstractSection {
     }
     Experience that = (Experience) o;
     return organisations.equals(that.organisations);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(organisations);
   }
 
   @Override

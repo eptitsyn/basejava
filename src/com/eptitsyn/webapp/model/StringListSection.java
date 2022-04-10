@@ -21,6 +21,10 @@ public class StringListSection extends AbstractSection {
     this.list = list;
   }
 
+  public List<String> getList() {
+    return list;
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(list);

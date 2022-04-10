@@ -53,11 +53,6 @@ public class Organisation implements Serializable {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(name, website);
-  }
-
-  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -66,7 +61,13 @@ public class Organisation implements Serializable {
       return false;
     }
     Organisation that = (Organisation) o;
-    return name.equals(that.name) && Objects.equals(website, that.website);
+    return name.equals(that.name) && website.equals(that.website) && Objects.equals(
+        positions, that.positions);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, website, positions);
   }
 
   @Override
