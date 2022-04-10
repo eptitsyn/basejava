@@ -9,7 +9,6 @@ import com.eptitsyn.webapp.model.Resume;
 import com.eptitsyn.webapp.model.SectionType;
 import com.eptitsyn.webapp.model.StringListSection;
 import com.eptitsyn.webapp.model.StringSection;
-import com.eptitsyn.webapp.util.LocalDateAdapter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -20,7 +19,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
 public class DataStreamSerializer implements Serializer {
 
@@ -40,7 +38,7 @@ public class DataStreamSerializer implements Serializer {
         dos.writeUTF(entry.getValue().getClass().getSimpleName());
         switch (entry.getValue().getClass().getSimpleName()) {
           case "StringSection":
-              dos.writeUTF(((StringSection)entry.getValue()).getText());
+            dos.writeUTF(((StringSection) entry.getValue()).getText());
             break;
           case "Experience":
             serializeCollection(((Experience) entry.getValue()).getOrganisations(), dos, item -> {
@@ -55,7 +53,8 @@ public class DataStreamSerializer implements Serializer {
             });
             break;
           case "StringListSection":
-            serializeCollection(((StringListSection) entry.getValue()).getList(), dos, dos::writeUTF);
+            serializeCollection(((StringListSection) entry.getValue()).getList(), dos,
+                dos::writeUTF);
             break;
         }
       });
@@ -68,8 +67,9 @@ public class DataStreamSerializer implements Serializer {
       String uuid = dis.readUTF();
       String fullName = dis.readUTF();
       Resume resume = new Resume(uuid, fullName);
-      deserializeCollection(dis, () -> resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
-      deserializeCollection(dis, ()-> {
+      deserializeCollection(dis,
+          () -> resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
+      deserializeCollection(dis, () -> {
         SectionType name = SectionType.valueOf(dis.readUTF());
         switch (dis.readUTF()) {
           case "StringSection":
@@ -83,12 +83,12 @@ public class DataStreamSerializer implements Serializer {
               String orgName = dis.readUTF();
               URL orgURL = new URL(dis.readUTF());
               List<Position> positions = deserializeList(dis, () -> {
-                //todo parse date
                 String start = dis.readUTF();
                 String end = dis.readUTF();
                 String title = dis.readUTF();
                 String description = dis.readUTF();
-                return new Position(LocalDate.parse(start), LocalDate.parse(end), title, description);
+                return new Position(LocalDate.parse(start), LocalDate.parse(end), title,
+                    description);
               });
               return new Organisation(orgName, orgURL, positions);
             });
@@ -108,14 +108,15 @@ public class DataStreamSerializer implements Serializer {
     }
   }
 
-  private <T> List<T> deserializeList(DataInputStream dis, FuncWithException<T> func) throws IOException{
+  private <T> List<T> deserializeList(DataInputStream dis, FuncWithException<T> func)
+      throws IOException {
     List<T> list = new ArrayList<>();
-    deserializeCollection(dis, () -> { list.add(func.result());
-    });
+    deserializeCollection(dis, () -> list.add(func.result()));
     return list;
   }
 
-  private <T> void deserializeCollection(DataInputStream dis, ProcessorWithException processor) throws IOException {
+  private void deserializeCollection(DataInputStream dis, ProcessorWithException processor)
+      throws IOException {
     int size = dis.readInt();
     for (int i = 0; i < size; i++) {
       processor.process();
@@ -123,14 +124,17 @@ public class DataStreamSerializer implements Serializer {
   }
 
   private interface ConsumerWithException<T> {
+
     void accept(T t) throws IOException;
   }
 
   private interface ProcessorWithException {
+
     void process() throws IOException;
   }
 
   private interface FuncWithException<T> {
+
     T result() throws IOException;
   }
 }
