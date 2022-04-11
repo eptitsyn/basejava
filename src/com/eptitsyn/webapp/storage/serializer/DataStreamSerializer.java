@@ -35,24 +35,26 @@ public class DataStreamSerializer implements Serializer {
 
       serializeCollection(resume.getSections().entrySet(), dos, entry -> {
         dos.writeUTF(entry.getKey().name());
-        dos.writeUTF(entry.getValue().getClass().getSimpleName());
-        switch (entry.getValue().getClass().getSimpleName()) {
-          case "StringSection":
+        switch (entry.getKey()) {
+          case PERSONAL:
+          case OBJECTIVE:
             dos.writeUTF(((StringSection) entry.getValue()).getText());
             break;
-          case "Experience":
+          case EXPERIENCE:
+          case EDUCATION:
             serializeCollection(((Experience) entry.getValue()).getOrganisations(), dos, item -> {
               dos.writeUTF(item.getName());
-              dos.writeUTF(item.getWebsite().toString());
+              writeObjectOrNull(dos, item.getWebsite().toString());
               serializeCollection(item.getPositions(), dos, position -> {
-                dos.writeUTF(position.getStartDate().toString());
-                dos.writeUTF(position.getEndDate().toString());
+                writeDate(dos, position.getStartDate());
+                writeDate(dos, position.getEndDate());
                 dos.writeUTF(position.getTitle());
-                dos.writeUTF(position.getDescription());
+                writeObjectOrNull(dos, position.getDescription());
               });
             });
             break;
-          case "StringListSection":
+          case ACHIEVEMENTS:
+          case QUALIFICATIONS:
             serializeCollection(((StringListSection) entry.getValue()).getList(), dos,
                 dos::writeUTF);
             break;
@@ -71,24 +73,26 @@ public class DataStreamSerializer implements Serializer {
           () -> resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
       deserializeCollection(dis, () -> {
         SectionType name = SectionType.valueOf(dis.readUTF());
-        switch (dis.readUTF()) {
-          case "StringSection":
+        switch (name) {
+          case PERSONAL:
+          case OBJECTIVE:
             resume.putSection(name, new StringSection(dis.readUTF()));
             break;
-          case "StringListSection":
+          case ACHIEVEMENTS:
+          case QUALIFICATIONS:
             resume.putSection(name, new StringListSection(deserializeList(dis, dis::readUTF)));
             break;
-          case "Experience":
+          case EXPERIENCE:
+          case EDUCATION:
             List<Organisation> lo = deserializeList(dis, () -> {
               String orgName = dis.readUTF();
-              URL orgURL = new URL(dis.readUTF());
+              URL orgURL = readObjectOrNull(dis, () -> new URL(dis.readUTF()));
               List<Position> positions = deserializeList(dis, () -> {
-                String start = dis.readUTF();
-                String end = dis.readUTF();
+                LocalDate start = readDate(dis);
+                LocalDate end = readDate(dis);
                 String title = dis.readUTF();
-                String description = dis.readUTF();
-                return new Position(LocalDate.parse(start), LocalDate.parse(end), title,
-                    description);
+                String description = readObjectOrNull(dis, dis::readUTF);
+                return new Position(start, end, title, description);
               });
               return new Organisation(orgName, orgURL, positions);
             });
@@ -99,9 +103,32 @@ public class DataStreamSerializer implements Serializer {
     }
   }
 
-  private <T> void serializeCollection(Collection<T> collection, DataOutputStream dos,
-      ConsumerWithException<T> consumer)
+  private void writeDate(DataOutputStream dos, LocalDate position) throws IOException {
+    dos.writeInt(position.getYear());
+    dos.writeInt(position.getMonthValue());
+  }
+
+  private LocalDate readDate(DataInputStream dis) throws IOException {
+    return LocalDate.of(dis.readInt(), dis.readInt(), 1);
+  }
+
+  private <T> void writeObjectOrNull(DataOutputStream dos, T t) throws IOException {
+    dos.writeBoolean(t != null);
+    if (t != null) {
+      dos.writeUTF(t.toString());
+    }
+  }
+
+  private <T> T readObjectOrNull(DataInputStream dis, FuncWithException<T> reader)
       throws IOException {
+    if (dis.readBoolean()) {
+      return reader.result();
+    }
+    return null;
+  }
+
+  private <T> void serializeCollection(Collection<T> collection, DataOutputStream dos,
+      ConsumerWithException<T> consumer) throws IOException {
     dos.writeInt(collection.size());
     for (T t : collection) {
       consumer.accept(t);
@@ -123,16 +150,19 @@ public class DataStreamSerializer implements Serializer {
     }
   }
 
+  @FunctionalInterface
   private interface ConsumerWithException<T> {
 
     void accept(T t) throws IOException;
   }
 
+  @FunctionalInterface
   private interface ProcessorWithException {
 
     void process() throws IOException;
   }
 
+  @FunctionalInterface
   private interface FuncWithException<T> {
 
     T result() throws IOException;

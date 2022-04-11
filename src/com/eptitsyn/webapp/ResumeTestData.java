@@ -7,9 +7,11 @@ import com.eptitsyn.webapp.model.Resume;
 import com.eptitsyn.webapp.model.SectionType;
 import com.eptitsyn.webapp.model.StringListSection;
 import com.eptitsyn.webapp.model.StringSection;
+import com.eptitsyn.webapp.util.DateUtil;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -44,26 +46,26 @@ public class ResumeTestData {
     List<Organisation> qualificationRecords = Arrays.asList(
         new Organisation(
             "Luxsoft", new URL("https://luxsoft.com"), Arrays.asList(new Organisation.Position(
-                LocalDate.now().minusYears(5),
-                LocalDate.now().minusYears(4),
+                DateUtil.of(2005, Month.of(1)),
+                DateUtil.of(2006, Month.of(5)),
                 "Junior developer",
                 "Some job description"),
             new Organisation.Position(
-                LocalDate.now().minusYears(4),
-                LocalDate.now().minusYears(3),
+                DateUtil.of(2006, Month.of(5)),
+                DateUtil.of(2007, Month.of(9)),
                 "Middle developer",
                 "Some another job description")
         )
         ),
         new Organisation(
             "Yota", new URL("https://yota.ru"), Arrays.asList(new Organisation.Position(
-                LocalDate.now().minusYears(3),
-                LocalDate.now().minusYears(2),
+                DateUtil.of(2007, Month.of(9)),
+                DateUtil.of(2009, Month.of(1)),
                 "Middle developer",
                 "Some job description"),
             new Organisation.Position(
-                LocalDate.now().minusYears(2),
-                LocalDate.now().minusYears(1),
+                DateUtil.of(2009, Month.of(9)),
+                DateUtil.of(2015, Month.of(1)),
                 "Senior developer",
                 "Some another job description")
         )
