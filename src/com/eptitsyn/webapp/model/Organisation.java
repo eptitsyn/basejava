@@ -61,13 +61,12 @@ public class Organisation implements Serializable {
       return false;
     }
     Organisation that = (Organisation) o;
-    return name.equals(that.name) && website.equals(that.website) && Objects.equals(
-        positions, that.positions);
+    return name.equals(that.name) && Objects.equals(website, that.website);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, website, positions);
+    return Objects.hash(name, website);
   }
 
   @Override

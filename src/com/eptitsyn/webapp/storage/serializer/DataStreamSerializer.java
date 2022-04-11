@@ -1,5 +1,6 @@
 package com.eptitsyn.webapp.storage.serializer;
 
+import com.eptitsyn.webapp.model.AbstractSection;
 import com.eptitsyn.webapp.model.ContactType;
 import com.eptitsyn.webapp.model.Experience;
 import com.eptitsyn.webapp.model.Organisation;
@@ -33,28 +34,30 @@ public class DataStreamSerializer implements Serializer {
       });
 
       serializeCollection(resume.getSections().entrySet(), dos, entry -> {
-        dos.writeUTF(entry.getKey().name());
-        switch (entry.getKey()) {
+        SectionType entryKey = entry.getKey();
+        AbstractSection entryValue = entry.getValue();
+        dos.writeUTF(entryKey.name());
+        switch (entryKey) {
           case PERSONAL:
           case OBJECTIVE:
-            dos.writeUTF(((StringSection) entry.getValue()).getText());
+            dos.writeUTF(((StringSection) entryValue).getText());
             break;
           case EXPERIENCE:
           case EDUCATION:
-            serializeCollection(((Experience) entry.getValue()).getOrganisations(), dos, item -> {
+            serializeCollection(((Experience) entryValue).getOrganisations(), dos, item -> {
               dos.writeUTF(item.getName());
-              writeObjectOrNull(dos, item.getWebsite().toString());
+              dos.writeUTF(item.getWebsite() != null ? item.getWebsite().toString() : "");
               serializeCollection(item.getPositions(), dos, position -> {
                 writeDate(dos, position.getStartDate());
                 writeDate(dos, position.getEndDate());
                 dos.writeUTF(position.getTitle());
-                writeObjectOrNull(dos, position.getDescription());
+                dos.writeUTF(position.getDescription() != null ? position.getDescription() : "");
               });
             });
             break;
           case ACHIEVEMENTS:
           case QUALIFICATIONS:
-            serializeCollection(((StringListSection) entry.getValue()).getList(), dos,
+            serializeCollection(((StringListSection) entryValue).getList(), dos,
                 dos::writeUTF);
             break;
         }
@@ -85,12 +88,13 @@ public class DataStreamSerializer implements Serializer {
           case EDUCATION:
             List<Organisation> organisationList = deserializeList(dis, () -> {
               String orgName = dis.readUTF();
-              URL orgURL = readObjectOrNull(dis, () -> new URL(dis.readUTF()));
+              String url = dis.readUTF();
+              URL orgURL = "".equals(url) ? null : new URL(url);
               List<Position> positions = deserializeList(dis, () -> {
                 LocalDate start = readDate(dis);
                 LocalDate end = readDate(dis);
                 String title = dis.readUTF();
-                String description = readObjectOrNull(dis, dis::readUTF);
+                String description = dis.readUTF();
                 return new Position(start, end, title, description);
               });
               return new Organisation(orgName, orgURL, positions);
@@ -109,21 +113,6 @@ public class DataStreamSerializer implements Serializer {
 
   private LocalDate readDate(DataInputStream dis) throws IOException {
     return LocalDate.of(dis.readInt(), dis.readInt(), 1);
-  }
-
-  private <T> void writeObjectOrNull(DataOutputStream dos, T t) throws IOException {
-    dos.writeBoolean(t != null);
-    if (t != null) {
-      dos.writeUTF(t.toString());
-    }
-  }
-
-  private <T> T readObjectOrNull(DataInputStream dis, FuncWithException<T> reader)
-      throws IOException {
-    if (dis.readBoolean()) {
-      return reader.result();
-    }
-    return null;
   }
 
   private <T> void serializeCollection(Collection<T> collection, DataOutputStream dos,

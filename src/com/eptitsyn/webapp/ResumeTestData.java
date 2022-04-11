@@ -86,6 +86,13 @@ public class ResumeTestData {
                 LocalDate.parse("2011-04-01"),
                 "Курс \"Объектно-ориентированный анализ ИС. Концептуальное моделирование на UML.\"",
                 " "))
+        ),
+        new Organisation("Acme Ltd.", null, Collections.singletonList(
+            new Organisation.Position(
+                LocalDate.parse("2011-03-01"),
+                LocalDate.parse("2011-04-01"),
+                "Курс \"Объектно-ориентированный анализ ИС. Концептуальное моделирование на UML.\"",
+                " "))
         )
     ));
 
