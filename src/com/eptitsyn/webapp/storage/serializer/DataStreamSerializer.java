@@ -1,6 +1,5 @@
 package com.eptitsyn.webapp.storage.serializer;
 
-
 import com.eptitsyn.webapp.model.ContactType;
 import com.eptitsyn.webapp.model.Experience;
 import com.eptitsyn.webapp.model.Organisation;
@@ -84,7 +83,7 @@ public class DataStreamSerializer implements Serializer {
             break;
           case EXPERIENCE:
           case EDUCATION:
-            List<Organisation> lo = deserializeList(dis, () -> {
+            List<Organisation> organisationList = deserializeList(dis, () -> {
               String orgName = dis.readUTF();
               URL orgURL = readObjectOrNull(dis, () -> new URL(dis.readUTF()));
               List<Position> positions = deserializeList(dis, () -> {
@@ -96,7 +95,7 @@ public class DataStreamSerializer implements Serializer {
               });
               return new Organisation(orgName, orgURL, positions);
             });
-            resume.putSection(name, new Experience(lo));
+            resume.putSection(name, new Experience(organisationList));
         }
       });
       return resume;
