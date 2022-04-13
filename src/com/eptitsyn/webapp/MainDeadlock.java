@@ -40,8 +40,7 @@ public class MainDeadlock {
           System.out.println("thread 1");
         }
       }
-      System.out.println("Thread " + Thread.currentThread().getName() + " finished"
-          + "");
+      System.out.println("Thread " + Thread.currentThread().getName() + " finished");
     }
   }
 }
