@@ -1,6 +1,5 @@
 package com.eptitsyn.webapp;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,6 @@ public class MainStreams {
     return Arrays.stream(values).distinct().sorted().reduce(0, (a, b) -> a * 10 + b);
   }
 
-
   static List<Integer> oddOrEven(List<Integer> integers) {
     AtomicInteger sum = new AtomicInteger();
     Map<Boolean, List<Integer>> result = integers.stream()
@@ -29,5 +27,4 @@ public class MainStreams {
         }));
     return result.get(((sum.get() % 2) != 0));
   }
-
 }
