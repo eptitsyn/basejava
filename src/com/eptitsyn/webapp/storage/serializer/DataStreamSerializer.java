@@ -46,12 +46,13 @@ public class DataStreamSerializer implements Serializer {
           case EDUCATION:
             serializeCollection(((Experience) entryValue).getOrganisations(), dos, item -> {
               dos.writeUTF(item.getName());
-              dos.writeUTF(item.getWebsite() != null ? item.getWebsite().toString() : "");
+              URL website = item.getWebsite();
+              writeEmptyOrString(dos, website);
               serializeCollection(item.getPositions(), dos, position -> {
                 writeDate(dos, position.getStartDate());
                 writeDate(dos, position.getEndDate());
                 dos.writeUTF(position.getTitle());
-                dos.writeUTF(position.getDescription() != null ? position.getDescription() : "");
+                writeEmptyOrString(dos, position.getDescription());
               });
             });
             break;
@@ -62,6 +63,14 @@ public class DataStreamSerializer implements Serializer {
             break;
         }
       });
+    }
+  }
+
+  private void writeEmptyOrString(DataOutputStream dos, Object description) throws IOException {
+    if (description != null) {
+      dos.writeUTF(description.toString());
+    } else {
+      dos.writeUTF("");
     }
   }
 
