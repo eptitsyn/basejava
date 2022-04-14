@@ -21,6 +21,6 @@ public class MainStreams {
   static List<Integer> oddOrEven(List<Integer> integers) {
     Map<Boolean, List<Integer>> result = integers.stream()
         .collect(Collectors.partitioningBy(x -> x % 2 == 0));
-    return result.get(result.get(false).size() % 2 == 0);
+    return result.get(result.get(false).size() % 2 != 0);
   }
 }
