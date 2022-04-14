@@ -11,7 +11,7 @@ public class MainStreams {
   public static void main(String[] args) {
     System.out.println(minValue(new int[]{1, 2, 3, 3, 2, 3}));
     System.out.println(minValue(new int[]{9, 8}));
-    System.out.println(oddOrEven(Arrays.asList(1, 2, 0, 9)));
+    System.out.println(oddOrEven(Arrays.asList(1, 2)));
   }
 
   static int minValue(int[] values) {
