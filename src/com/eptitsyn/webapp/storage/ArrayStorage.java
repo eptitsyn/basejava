@@ -7,23 +7,23 @@ import com.eptitsyn.webapp.model.Resume;
  */
 public class ArrayStorage extends AbstractArrayStorage {
 
-  @Override
-  protected void deallocateResume(int index) {
-    storage[index] = null;
-    System.arraycopy(storage, index + 1, storage, index, count - 1 - index);
-  }
-
-  @Override
-  protected void putResume(Resume resume, int index) {
-    storage[count] = resume;
-  }
-
-  protected Integer doGetSearchKey(String uuid) {
-    for (int i = 0; i < count; i++) {
-      if (storage[i].getUuid().equals(uuid)) {
-        return i;
-      }
+    @Override
+    protected void deallocateResume(int index) {
+        storage[index] = null;
+        System.arraycopy(storage, index + 1, storage, index, count - 1 - index);
     }
-    return -1;
-  }
+
+    @Override
+    protected void putResume(Resume resume, int index) {
+        storage[count] = resume;
+    }
+
+    protected Integer doGetSearchKey(String uuid) {
+        for (int i = 0; i < count; i++) {
+            if (storage[i].getUuid().equals(uuid)) {
+                return i;
+            }
+        }
+        return -1;
+    }
 }

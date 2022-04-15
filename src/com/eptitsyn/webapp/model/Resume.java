@@ -16,111 +16,113 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Resume implements Comparable<Resume>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  private final Map<SectionType, AbstractSection> sections = new EnumMap<>(SectionType.class);
-  private final Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
-  // Unique identifier
-  private String uuid;
-  private String fullName;
+    private static final long serialVersionUID = 1L;
+    private final Map<SectionType, AbstractSection> sections = new EnumMap<>(SectionType.class);
+    private final Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
+    // Unique identifier
+    private String uuid;
+    private String fullName;
 
-  public Resume() {
-  }
+    public Resume() {
+    }
 
-  public Resume(String fullName) {
-    this(UUID.randomUUID().toString(), fullName);
-  }
+    public Resume(String fullName) {
+        this(UUID.randomUUID().toString(), fullName);
+    }
 
-  public Resume(String uuid, String fullName) {
-    this.uuid = uuid;
-    this.fullName = fullName;
-  }
+    public Resume(String uuid, String fullName) {
+        this.uuid = uuid;
+        this.fullName = fullName;
+    }
 
-  public String getContact(ContactType type) {
-    return contacts.get(type);
-  }
+    public String getContact(ContactType type) {
+        return contacts.get(type);
+    }
 
-  public void addContact(ContactType type, String value) {
-    contacts.put(type, value);
-  }
+    public void addContact(ContactType type, String value) {
+        contacts.put(type, value);
+    }
 
-  public Map<ContactType, String> getContacts() {
-    return contacts;
-  }
+    public Map<ContactType, String> getContacts() {
+        return contacts;
+    }
 
-  public String getFullName() {
-    return fullName;
-  }
+    public String getFullName() {
+        return fullName;
+    }
 
-  public void setFullName(String fullName) {
-    this.fullName = fullName;
-  }
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
-  public AbstractSection getSection(SectionType type) {
-    return sections.get(type);
-  }
+    public AbstractSection getSection(SectionType type) {
+        return sections.get(type);
+    }
 
-  public Map<SectionType, AbstractSection> getSections() {
-    return sections;
-  }
+    public Map<SectionType, AbstractSection> getSections() {
+        return sections;
+    }
 
-  public void putContacts(ContactType type, String contact) {
-    contacts.put(type, contact);
-  }
+    public void putContacts(ContactType type, String contact) {
+        contacts.put(type, contact);
+    }
 
-  public void putSection(SectionType type, AbstractSection section) {
-    sections.put(type, section);
-  }
+    public void putSection(SectionType type, AbstractSection section) {
+        sections.put(type, section);
+    }
 
-  @Override
-  public int compareTo(Resume o) {
-    return uuid.compareTo(o.getUuid());
-  }
+    @Override
+    public int compareTo(Resume o) {
+        return uuid.compareTo(o.getUuid());
+    }
 
-  public String getUuid() {
-    return uuid;
-  }
+    public String getUuid() {
+        return uuid;
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(uuid, fullName, sections, contacts);
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid, fullName, sections, contacts);
+    }
 
-  @Override
-  public boolean equals(Object o) {
-      if (this == o) {
-          return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-          return false;
-      }
-    Resume resume = (Resume) o;
-    return uuid.equals(resume.uuid) && Objects.equals(fullName, resume.fullName) && Objects.equals(
-        sections, resume.sections) && Objects.equals(contacts, resume.contacts);
-  }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Resume resume = (Resume) o;
+        return uuid.equals(resume.uuid) && Objects.equals(fullName, resume.fullName)
+            && Objects.equals(
+            sections, resume.sections) && Objects.equals(contacts, resume.contacts);
+    }
 
-  @Override
-  public String toString() {
-    return uuid + "\n\n"
-        + fullName + "\n\n"
-        + contactsToString()
-        + sectionsToString();
-  }
+    @Override
+    public String toString() {
+        return uuid + "\n\n"
+            + fullName + "\n\n"
+            + contactsToString()
+            + sectionsToString();
+    }
 
-  private String contactsToString() {
-    StringBuilder builder = new StringBuilder();
+    private String contactsToString() {
+        StringBuilder builder = new StringBuilder();
 
-    contacts.forEach(
-        (key, value) -> builder.append(key.toString()).append(" : ").append(value).append("\n"));
-    return builder.toString();
-  }
+        contacts.forEach(
+            (key, value) -> builder.append(key.toString()).append(" : ").append(value)
+                .append("\n"));
+        return builder.toString();
+    }
 
-  private String sectionsToString() {
-    StringBuilder builder = new StringBuilder();
+    private String sectionsToString() {
+        StringBuilder builder = new StringBuilder();
 
-    sections.forEach((key, value) -> {
-      builder.append(key.toString()).append("\n");
-      builder.append(value.toString()).append("\n");
-    });
-    return builder.toString();
-  }
+        sections.forEach((key, value) -> {
+            builder.append(key.toString()).append("\n");
+            builder.append(value.toString()).append("\n");
+        });
+        return builder.toString();
+    }
 }

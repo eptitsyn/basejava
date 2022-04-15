@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.eptitsyn.webapp.Config;
 import com.eptitsyn.webapp.exception.ExistStorageException;
 import com.eptitsyn.webapp.exception.NotExistStorageException;
 import com.eptitsyn.webapp.exception.StorageException;
@@ -18,7 +19,7 @@ import org.junit.jupiter.api.Test;
 
 abstract class AbstractStorageTest {
 
-  protected static final String STORAGE_DIR = "/Users/ep/Documents/dev/java-ops/basejava/storage";
+  protected static final String STORAGE_DIR = Config.get().getStorageDir();
 
   protected static final int EXPECTED_SIZE = 5;
   protected final Storage storage;
