@@ -1,8 +1,5 @@
 package com.eptitsyn.webapp.exception;
 
-import com.eptitsyn.webapp.storage.Storage;
-import java.sql.SQLException;
-
 public class StorageException extends RuntimeException {
 
     private final String uuid;

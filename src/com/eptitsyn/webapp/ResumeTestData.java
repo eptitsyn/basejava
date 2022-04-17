@@ -22,7 +22,7 @@ public class ResumeTestData {
     public static Resume generateTestResume(String uuid, String fullName)
         throws MalformedURLException {
         Resume resume = new Resume(uuid, fullName);
-        //TODO
+
         resume.putSection(SectionType.PERSONAL,
             new StringSection(
                 "Аналитический склад ума, сильная логика, креативность, инициативность. Пурист кода и архитектуры."));
