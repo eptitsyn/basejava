@@ -1,9 +1,11 @@
 package com.eptitsyn.webapp.sql;
 
+import com.eptitsyn.webapp.exception.ExistStorageException;
 import com.eptitsyn.webapp.exception.StorageException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import org.postgresql.util.PSQLException;
 
 public class SqlUtil {
 
@@ -14,15 +16,17 @@ public class SqlUtil {
     }
 
     public <T> T executeQuery(String sql,
-        SqlFunction<PreparedStatement, T> handler, Object... id) {
+        SqlFunction<PreparedStatement, T> handler) {
         try (Connection connection = connectionFactory.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql)) {
-            for (int i = 0; i < id.length; i++) {
-                ps.setObject(i + 1, id[i]);
-            }
             return handler.apply(ps);
+        } catch (PSQLException e) {
+            if ("23505".equals(e.getSQLState())) {
+                throw new ExistStorageException("n/a");
+            }
         } catch (SQLException e) {
             throw new StorageException(e);
         }
+        return null;
     }
 }

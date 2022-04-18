@@ -1,6 +1,5 @@
 package com.eptitsyn.webapp.storage;
 
-import com.eptitsyn.webapp.exception.ExistStorageException;
 import com.eptitsyn.webapp.exception.NotExistStorageException;
 import com.eptitsyn.webapp.exception.StorageException;
 import com.eptitsyn.webapp.model.Resume;
@@ -12,7 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.postgresql.util.PSQLException;
 
 public class SqlStorage implements Storage {
 
@@ -39,11 +37,13 @@ public class SqlStorage implements Storage {
     public void update(Resume r) {
         if (sqlUtil.executeQuery("UPDATE resume SET full_name=? WHERE uuid=?", ps -> {
             try {
+                ps.setObject(1, r.getFullName());
+                ps.setObject(2, r.getUuid());
                 return ps.executeUpdate();
             } catch (SQLException e) {
                 throw new StorageException(e);
             }
-        }, r.getFullName(), r.getUuid()) != 1) {
+        }) != 1) {
             throw new NotExistStorageException(r.getUuid());
         }
     }
@@ -51,32 +51,31 @@ public class SqlStorage implements Storage {
     @Override
     public void save(Resume r) {
         sqlUtil.executeQuery("INSERT INTO resume (uuid, full_name) VALUES (?,?)", ps -> {
-            try {
-                return ps.executeUpdate();
-            } catch (PSQLException e) {
-                if ("23505".equals(e.getSQLState())) {
-                    throw new ExistStorageException(r.getUuid());
-                }
-                throw e;
-            }
-        }, r.getUuid(), r.getFullName());
+            ps.setObject(1, r.getUuid());
+            ps.setObject(2, r.getFullName());
+            return ps.executeUpdate();
+        });
     }
 
     @Override
     public Resume get(String uuid) {
         return sqlUtil.executeQuery("SELECT * FROM resume WHERE uuid=?", ps -> {
+            ps.setObject(1, uuid);
             ResultSet resultSet = ps.executeQuery();
             if (!resultSet.next()) {
                 throw new NotExistStorageException(uuid);
             }
             return new Resume(resultSet.getString("uuid"), resultSet.getString("full_name"));
-        }, uuid);
+        });
     }
 
     @Override
     public void delete(String uuid) {
         if (sqlUtil.executeQuery("DELETE FROM resume WHERE uuid=?",
-            PreparedStatement::executeUpdate, uuid) != 1) {
+            ps -> {
+                ps.setObject(1, uuid);
+                return ps.executeUpdate();
+            }) != 1) {
             throw new NotExistStorageException(uuid);
         }
     }
