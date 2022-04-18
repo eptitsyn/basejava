@@ -1,7 +1,6 @@
-package com.eptitsyn.webapp.util;
+package com.eptitsyn.webapp.sql;
 
 import com.eptitsyn.webapp.exception.StorageException;
-import com.eptitsyn.webapp.sql.ConnectionFactory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -15,7 +14,7 @@ public class SqlUtil {
     }
 
     public <T> T executeQuery(String sql,
-        SqlFunc<PreparedStatement, T> handler, Object... id) {
+        SqlFunction<PreparedStatement, T> handler, Object... id) {
         try (Connection connection = connectionFactory.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql)) {
             for (int i = 0; i < id.length; i++) {
@@ -25,11 +24,5 @@ public class SqlUtil {
         } catch (SQLException e) {
             throw new StorageException(e);
         }
-    }
-
-    @FunctionalInterface
-    public interface SqlFunc<T, R> {
-
-        R apply(T t) throws SQLException;
     }
 }
