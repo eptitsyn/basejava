@@ -37,14 +37,13 @@ public class SqlStorage implements Storage {
 
     @Override
     public void update(Resume r) {
-        if (sqlUtil.executeQuery("UPDATE resume SET full_name=? WHERE uuid=?",
-            ps -> {
-                try {
-                    return ps.executeUpdate();
-                } catch (SQLException e) {
-                    throw new StorageException(e);
-                }
-            }, r.getFullName(), r.getUuid()) != 1) {
+        if (sqlUtil.executeQuery("UPDATE resume SET full_name=? WHERE uuid=?", ps -> {
+            try {
+                return ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new StorageException(e);
+            }
+        }, r.getFullName(), r.getUuid()) != 1) {
             throw new NotExistStorageException(r.getUuid());
         }
     }
@@ -52,17 +51,16 @@ public class SqlStorage implements Storage {
     @Override
     public void save(Resume r) {
         try {
-            sqlUtil.executeQuery("INSERT INTO resume (uuid, full_name) VALUES (?,?)",
-                ps -> {
-                    try {
-                        return ps.executeUpdate();
-                    } catch (PSQLException e) {
-                        if("23505".equals(e.getSQLState())) {
-                            throw new ExistStorageException(r.getUuid());
-                        }
-                        throw e;
+            sqlUtil.executeQuery("INSERT INTO resume (uuid, full_name) VALUES (?,?)", ps -> {
+                try {
+                    return ps.executeUpdate();
+                } catch (PSQLException e) {
+                    if ("23505".equals(e.getSQLState())) {
+                        throw new ExistStorageException(r.getUuid());
                     }
-                }, r.getUuid(), r.getFullName());
+                    throw e;
+                }
+            }, r.getUuid(), r.getFullName());
         } catch (StorageException e) {
             if (e.getMessage().contains("duplicate")) {
                 throw new ExistStorageException(r.getUuid());
@@ -73,15 +71,13 @@ public class SqlStorage implements Storage {
 
     @Override
     public Resume get(String uuid) {
-        return sqlUtil.executeQuery("SELECT * FROM resume WHERE uuid=?",
-            ps -> {
-                ResultSet resultSet = ps.executeQuery();
-                if (!resultSet.next()) {
-                    throw new NotExistStorageException(uuid);
-                }
-                return new Resume(resultSet.getString("uuid"),
-                    resultSet.getString("full_name"));
-            }, uuid);
+        return sqlUtil.executeQuery("SELECT * FROM resume WHERE uuid=?", ps -> {
+            ResultSet resultSet = ps.executeQuery();
+            if (!resultSet.next()) {
+                throw new NotExistStorageException(uuid);
+            }
+            return new Resume(resultSet.getString("uuid"), resultSet.getString("full_name"));
+        }, uuid);
     }
 
     @Override
@@ -94,29 +90,26 @@ public class SqlStorage implements Storage {
 
     @Override
     public List<Resume> getAllSorted() {
-        return sqlUtil.executeQuery(
-            "SELECT * FROM resume ORDER BY full_name",
-            ps -> {
-                ResultSet resultSet = ps.executeQuery();
-                List<Resume> resumes = new ArrayList<>();
-                while (resultSet.next()) {
-                    resumes.add(new Resume(resultSet.getString("uuid"),
-                        resultSet.getString("full_name")));
-                }
-                return resumes;
-            });
+        return sqlUtil.executeQuery("SELECT * FROM resume ORDER BY full_name", ps -> {
+            ResultSet resultSet = ps.executeQuery();
+            List<Resume> resumes = new ArrayList<>();
+            while (resultSet.next()) {
+                resumes.add(
+                    new Resume(resultSet.getString("uuid"), resultSet.getString("full_name")));
+            }
+            return resumes;
+        });
     }
 
     @Override
     public int size() {
-        return sqlUtil.executeQuery("SELECT COUNT(*) FROM resume",
-            preparedStatement -> {
-                if (preparedStatement.execute()) {
-                    ResultSet rs = preparedStatement.getResultSet();
-                    rs.next();
-                    return rs.getInt(1);
-                }
-                return 0;
-            });
+        return sqlUtil.executeQuery("SELECT COUNT(*) FROM resume", preparedStatement -> {
+            if (preparedStatement.execute()) {
+                ResultSet rs = preparedStatement.getResultSet();
+                rs.next();
+                return rs.getInt(1);
+            }
+            return 0;
+        });
     }
 }
