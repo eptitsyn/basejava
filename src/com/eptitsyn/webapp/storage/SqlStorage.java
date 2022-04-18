@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.postgresql.util.PSQLException;
 
 public class SqlStorage implements Storage {
 
@@ -55,8 +56,11 @@ public class SqlStorage implements Storage {
                 ps -> {
                     try {
                         return ps.executeUpdate();
-                    } catch (SQLException e) {
-                        throw new StorageException(e);
+                    } catch (PSQLException e) {
+                        if("23505".equals(e.getSQLState())) {
+                            throw new ExistStorageException(r.getUuid());
+                        }
+                        throw e;
                     }
                 }, r.getUuid(), r.getFullName());
         } catch (StorageException e) {
