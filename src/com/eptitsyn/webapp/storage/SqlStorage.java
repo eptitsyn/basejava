@@ -50,23 +50,16 @@ public class SqlStorage implements Storage {
 
     @Override
     public void save(Resume r) {
-        try {
-            sqlUtil.executeQuery("INSERT INTO resume (uuid, full_name) VALUES (?,?)", ps -> {
-                try {
-                    return ps.executeUpdate();
-                } catch (PSQLException e) {
-                    if ("23505".equals(e.getSQLState())) {
-                        throw new ExistStorageException(r.getUuid());
-                    }
-                    throw e;
+        sqlUtil.executeQuery("INSERT INTO resume (uuid, full_name) VALUES (?,?)", ps -> {
+            try {
+                return ps.executeUpdate();
+            } catch (PSQLException e) {
+                if ("23505".equals(e.getSQLState())) {
+                    throw new ExistStorageException(r.getUuid());
                 }
-            }, r.getUuid(), r.getFullName());
-        } catch (StorageException e) {
-            if (e.getMessage().contains("duplicate")) {
-                throw new ExistStorageException(r.getUuid());
+                throw e;
             }
-            throw e;
-        }
+        }, r.getUuid(), r.getFullName());
     }
 
     @Override
