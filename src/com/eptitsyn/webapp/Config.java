@@ -1,5 +1,7 @@
 package com.eptitsyn.webapp;
 
+import com.eptitsyn.webapp.storage.SqlStorage;
+import com.eptitsyn.webapp.storage.Storage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +13,7 @@ public class Config {
     protected static final File PROPERTIES = new File("./config/resumes.properties");
     private static final Config INSTANCE = new Config();
 
+    private final Storage sqlStorage;
     private final Properties props = new Properties();
     private final String storageDir;
     private final String dbUrl;
@@ -27,6 +30,7 @@ public class Config {
         } catch (IOException e) {
             throw new IllegalStateException("Invalid config file " + PROPERTIES.getAbsolutePath());
         }
+        sqlStorage = new SqlStorage(dbUrl, dbUser, dbPassword);
     }
 
     public static Config get() {
@@ -47,5 +51,9 @@ public class Config {
 
     public String getDbPassword() {
         return dbPassword;
+    }
+
+    public Storage getSqlStorage() {
+        return sqlStorage;
     }
 }
