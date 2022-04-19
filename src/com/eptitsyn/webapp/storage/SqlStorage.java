@@ -13,9 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SqlStorage implements Storage {
-
-
-    private final ConnectionFactory connectionFactory;
+    
     private final SqlUtil sqlUtil;
 
     public SqlStorage(String dbUrl, String dbUser, String dbPassword) {
@@ -24,7 +22,8 @@ public class SqlStorage implements Storage {
         } catch (ClassNotFoundException e) {
             throw new StorageException(e);
         }
-        connectionFactory = () -> DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+        ConnectionFactory connectionFactory = () -> DriverManager.getConnection(dbUrl, dbUser,
+            dbPassword);
         sqlUtil = new SqlUtil(connectionFactory);
     }
 
@@ -36,15 +35,11 @@ public class SqlStorage implements Storage {
     @Override
     public void update(Resume r) {
         sqlUtil.executeQuery("UPDATE resume SET full_name=? WHERE uuid=?", ps -> {
-            try {
                 ps.setObject(1, r.getFullName());
                 ps.setObject(2, r.getUuid());
                 if (ps.executeUpdate() != 1) {
                     throw new NotExistStorageException(r.getUuid());
                 }
-            } catch (SQLException e) {
-                throw new StorageException(e);
-            }
         });
     }
 
@@ -53,7 +48,7 @@ public class SqlStorage implements Storage {
         sqlUtil.executeQuery("INSERT INTO resume (uuid, full_name) VALUES (?,?)", ps -> {
             ps.setObject(1, r.getUuid());
             ps.setObject(2, r.getFullName());
-            ps.executeUpdate();
+            ps.execute();
         });
     }
 
@@ -86,7 +81,7 @@ public class SqlStorage implements Storage {
     @Override
     public List<Resume> getAllSorted() {
         List<Resume> resumes = new ArrayList<>();
-        sqlUtil.executeQuery("SELECT * FROM resume ORDER BY full_name", ps -> {
+        sqlUtil.executeQuery("SELECT * FROM resume ORDER BY full_name, uuid", ps -> {
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 resumes.add(
@@ -100,7 +95,8 @@ public class SqlStorage implements Storage {
     public int size() {
         final int[] result = new int[1];
         sqlUtil.executeQuery("SELECT COUNT(*) FROM resume", preparedStatement -> {
-            if (preparedStatement.execute()) {
+            boolean executeResult = preparedStatement.execute();
+            if (executeResult) {
                 ResultSet rs = preparedStatement.getResultSet();
                 rs.next();
                 result[0] = rs.getInt(1);

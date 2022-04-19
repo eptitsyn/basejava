@@ -103,7 +103,6 @@ abstract class AbstractStorageTest {
 
     List<Resume> expected = expectedResumes;
     expected.sort(AbstractStorage.RESUME_NAME_UUID_COMPARATOR);
-
     assertEquals(expected, actual);
   }
 }
