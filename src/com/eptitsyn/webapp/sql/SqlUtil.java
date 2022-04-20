@@ -15,11 +15,10 @@ public class SqlUtil {
         connectionFactory = cf;
     }
 
-    public void executeQuery(String sql,
-        SqlFunction<PreparedStatement> handler) {
+    public <T> T executeQuery(String sql, SqlFunction<PreparedStatement, T> handler) {
         try (Connection connection = connectionFactory.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql)) {
-            handler.apply(ps);
+            return handler.apply(ps);
         } catch (PSQLException e) {
             if ("23505".equals(e.getSQLState())) {
                 throw new ExistStorageException("n/a");
@@ -27,5 +26,6 @@ public class SqlUtil {
         } catch (SQLException e) {
             throw new StorageException(e);
         }
+        return null;
     }
 }

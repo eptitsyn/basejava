@@ -3,7 +3,7 @@ package com.eptitsyn.webapp.sql;
 import java.sql.SQLException;
 
 @FunctionalInterface
-public interface SqlFunction<T> {
+public interface SqlFunction<T, R> {
 
-    void apply(T t) throws SQLException;
+    R apply(T t) throws SQLException;
 }

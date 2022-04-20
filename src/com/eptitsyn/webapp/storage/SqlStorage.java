@@ -3,17 +3,15 @@ package com.eptitsyn.webapp.storage;
 import com.eptitsyn.webapp.exception.NotExistStorageException;
 import com.eptitsyn.webapp.exception.StorageException;
 import com.eptitsyn.webapp.model.Resume;
-import com.eptitsyn.webapp.sql.ConnectionFactory;
 import com.eptitsyn.webapp.sql.SqlUtil;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SqlStorage implements Storage {
-    
+
     private final SqlUtil sqlUtil;
 
     public SqlStorage(String dbUrl, String dbUser, String dbPassword) {
@@ -22,9 +20,7 @@ public class SqlStorage implements Storage {
         } catch (ClassNotFoundException e) {
             throw new StorageException(e);
         }
-        ConnectionFactory connectionFactory = () -> DriverManager.getConnection(dbUrl, dbUser,
-            dbPassword);
-        sqlUtil = new SqlUtil(connectionFactory);
+        sqlUtil = new SqlUtil(() -> DriverManager.getConnection(dbUrl, dbUser, dbPassword));
     }
 
     @Override
@@ -35,11 +31,12 @@ public class SqlStorage implements Storage {
     @Override
     public void update(Resume r) {
         sqlUtil.executeQuery("UPDATE resume SET full_name=? WHERE uuid=?", ps -> {
-                ps.setObject(1, r.getFullName());
-                ps.setObject(2, r.getUuid());
-                if (ps.executeUpdate() != 1) {
-                    throw new NotExistStorageException(r.getUuid());
-                }
+            ps.setObject(1, r.getFullName());
+            ps.setObject(2, r.getUuid());
+            if (ps.executeUpdate() != 1) {
+                throw new NotExistStorageException(r.getUuid());
+            }
+            return null;
         });
     }
 
@@ -49,61 +46,52 @@ public class SqlStorage implements Storage {
             ps.setObject(1, r.getUuid());
             ps.setObject(2, r.getFullName());
             ps.execute();
+            return null;
         });
     }
 
     @Override
     public Resume get(String uuid) {
-        final Resume[] result = new Resume[1];
-        sqlUtil.executeQuery("SELECT * FROM resume WHERE uuid=?", ps -> {
+        return sqlUtil.executeQuery("SELECT * FROM resume WHERE uuid=?", ps -> {
             ps.setObject(1, uuid);
             ResultSet resultSet = ps.executeQuery();
             if (!resultSet.next()) {
                 throw new NotExistStorageException(uuid);
             }
-            result[0] = new Resume(resultSet.getString("uuid"), resultSet.getString("full_name"));
+            return new Resume(resultSet.getString("uuid"), resultSet.getString("full_name"));
         });
-        return result[0];
     }
 
     @Override
     public void delete(String uuid) {
-        sqlUtil.executeQuery("DELETE FROM resume WHERE uuid=?",
-            ps -> {
-                ps.setObject(1, uuid);
-                if (ps.executeUpdate() != 1) {
-                    throw new NotExistStorageException(uuid);
-                }
-            });
+        sqlUtil.executeQuery("DELETE FROM resume WHERE uuid=?", ps -> {
+            ps.setObject(1, uuid);
+            if (ps.executeUpdate() != 1) {
+                throw new NotExistStorageException(uuid);
+            }
+            return null;
+        });
     }
 
 
     @Override
     public List<Resume> getAllSorted() {
-        List<Resume> resumes = new ArrayList<>();
-        sqlUtil.executeQuery("SELECT * FROM resume ORDER BY full_name, uuid", ps -> {
+        return sqlUtil.executeQuery("SELECT * FROM resume ORDER BY full_name, uuid", ps -> {
             ResultSet resultSet = ps.executeQuery();
+            List<Resume> resumes = new ArrayList<>();
             while (resultSet.next()) {
                 resumes.add(
                     new Resume(resultSet.getString("uuid"), resultSet.getString("full_name")));
             }
+            return resumes;
         });
-        return resumes;
     }
 
     @Override
     public int size() {
-        final int[] result = new int[1];
-        sqlUtil.executeQuery("SELECT COUNT(*) FROM resume", preparedStatement -> {
-            boolean executeResult = preparedStatement.execute();
-            if (executeResult) {
-                ResultSet rs = preparedStatement.getResultSet();
-                rs.next();
-                result[0] = rs.getInt(1);
-            } else {
-                result[0] = -1;
-            }
+        return sqlUtil.executeQuery("SELECT COUNT(*) FROM resume", ps -> {
+            ResultSet rs = ps.executeQuery();
+            return rs.next() ? rs.getInt(1) : 0;
         });
-        return result[0];
     }
 }

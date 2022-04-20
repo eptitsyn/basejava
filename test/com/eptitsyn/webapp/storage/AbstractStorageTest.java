@@ -2,7 +2,6 @@ package com.eptitsyn.webapp.storage;
 
 import static com.eptitsyn.webapp.ResumeTestData.generateTestResume;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.eptitsyn.webapp.Config;
@@ -49,7 +48,7 @@ abstract class AbstractStorageTest {
   @Test
   void update() {
     storage.update(expectedResumes.get(3));
-    assertSame(expectedResumes.get(3), storage.get(expectedResumes.get(3).getUuid()));
+    assertEquals(expectedResumes.get(3), storage.get(expectedResumes.get(3).getUuid()));
   }
 
   @Test
