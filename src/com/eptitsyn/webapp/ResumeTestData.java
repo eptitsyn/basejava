@@ -1,5 +1,6 @@
 package com.eptitsyn.webapp;
 
+import com.eptitsyn.webapp.model.ContactType;
 import com.eptitsyn.webapp.model.Resume;
 import java.net.MalformedURLException;
 import java.util.UUID;
@@ -85,9 +86,9 @@ public class ResumeTestData {
 //
 //        resume.putSection(SectionType.EDUCATION, educationSection);
 //
-//        resume.putContacts(ContactType.PHONE, "+7 800 555 35 35");
-//        resume.putContacts(ContactType.EMAIL, "james.bond@mi6.gov.uk");
-//        resume.putContacts(ContactType.SKYPE, "james.bond");
+    resume.putContacts(ContactType.PHONE, "+7 800 555 35 35");
+    resume.putContacts(ContactType.EMAIL, "james.bond@mi6.gov.uk");
+    resume.putContacts(ContactType.SKYPE, "james.bond");
 
     return resume;
   }
