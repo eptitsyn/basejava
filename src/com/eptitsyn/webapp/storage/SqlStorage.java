@@ -143,13 +143,12 @@ public class SqlStorage implements Storage {
             new Resume(rs.getString("uuid"), rs.getString("full_name")));
       }
       String value = rs.getString("value");
-      String type1 = rs.getString("type");
-      if (value != null && type1 != null) {
-        ContactType type = ContactType.valueOf(type1);
-        result.get(rs.getString("uuid")).addContact(type, value);
+      String type = rs.getString("type");
+      if (value != null && type != null) {
+        ContactType contactType = ContactType.valueOf(type);
+        result.get(rs.getString("uuid")).addContact(contactType, value);
       }
     } while (rs.next());
     return new ArrayList<>(result.values());
   }
-
 }
