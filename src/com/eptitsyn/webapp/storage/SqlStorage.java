@@ -11,7 +11,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,11 +43,7 @@ public class SqlStorage implements Storage {
           throw new NotExistStorageException(r.getUuid());
         }
       }
-      try (PreparedStatement ps = conn.prepareStatement(
-          "DELETE FROM contact WHERE resume_uuid=?")) {
-        ps.setObject(1, r.getUuid());
-        ps.execute();
-      }
+      deleteContacts(r, conn);
       saveContacts(r, conn);
       return null;
     });
@@ -66,7 +61,7 @@ public class SqlStorage implements Storage {
   @Override
   public Resume get(String uuid) {
     return sqlUtil.executeQuery(
-        "SELECT uuid,full_name,type,value FROM resume " +
+        "SELECT * FROM resume " +
             "LEFT JOIN contact on uuid=resume_uuid " +
             "WHERE uuid=?",
         ps -> {
@@ -89,7 +84,7 @@ public class SqlStorage implements Storage {
 
   @Override
   public List<Resume> getAllSorted() {
-    return sqlUtil.executeQuery("SELECT uuid,full_name,type,value FROM resume "
+    return sqlUtil.executeQuery("SELECT * FROM resume "
             + "LEFT JOIN contact on uuid=resume_uuid "
             + "ORDER BY full_name, uuid",
         ps -> {
@@ -104,6 +99,14 @@ public class SqlStorage implements Storage {
       ResultSet rs = ps.executeQuery();
       return rs.next() ? rs.getInt(1) : 0;
     });
+  }
+
+  private void deleteContacts(Resume r, Connection conn) throws SQLException {
+    try (PreparedStatement ps = conn.prepareStatement(
+        "DELETE FROM contact WHERE resume_uuid=?")) {
+      ps.setObject(1, r.getUuid());
+      ps.execute();
+    }
   }
 
   private void saveContacts(Resume r, Connection conn) throws SQLException {
@@ -129,26 +132,32 @@ public class SqlStorage implements Storage {
   }
 
   private Resume getResume(ResultSet rs, String uuid) throws SQLException {
-    return getResumeList(rs, uuid).get(0);
+    if (rs.isBeforeFirst()) {
+      rs.next();
+    }
+    if (rs.getString("uuid").equals(uuid)) {
+      Resume result = new Resume(rs.getString("uuid"), rs.getString("full_name"));
+      do {
+        String value = rs.getString("value");
+        String type = rs.getString("type");
+        if (value != null && type != null) {
+          ContactType contactType = ContactType.valueOf(type);
+          result.addContact(contactType, value);
+        }
+      } while (rs.next() && rs.getString("uuid").equals(uuid));
+      return result;
+    }
+    return null;
   }
 
   private List<Resume> getResumeList(ResultSet rs, String uuid) throws SQLException {
     if (!rs.next()) {
       throw new NotExistStorageException(uuid);
     }
-    Map<String, Resume> result = new LinkedHashMap<>();
+    List<Resume> result = new ArrayList<>();
     do {
-      if (result.get(rs.getString("uuid")) == null) {
-        result.put(rs.getString("uuid"),
-            new Resume(rs.getString("uuid"), rs.getString("full_name")));
-      }
-      String value = rs.getString("value");
-      String type = rs.getString("type");
-      if (value != null && type != null) {
-        ContactType contactType = ContactType.valueOf(type);
-        result.get(rs.getString("uuid")).addContact(contactType, value);
-      }
-    } while (rs.next());
-    return new ArrayList<>(result.values());
+      result.add(getResume(rs, rs.getString("uuid")));
+    } while (!rs.isAfterLast());
+    return result;
   }
 }
