@@ -56,9 +56,9 @@ public class SqlStorage implements Storage {
 
   @Override
   public List<Resume> getAllSorted() {
-    List<Resume> resumes = new ArrayList<>();
-    HashMap<String, Resume> resumeHashMap = new HashMap<>();
-    sqlUtil.transactionalExecute(conn -> {
+    return sqlUtil.transactionalExecute(conn -> {
+      List<Resume> resumes = new ArrayList<>();
+      HashMap<String, Resume> resumeHashMap = new HashMap<>();
       try (PreparedStatement ps = conn.prepareStatement(
               "SELECT * FROM resume ORDER BY full_name, uuid")) {
         ResultSet rs = ps.executeQuery();
@@ -76,9 +76,8 @@ public class SqlStorage implements Storage {
                   .addContact(ContactType.valueOf(rs.getString("type")), rs.getString("value"));
         }
       }
-      return null;
+      return resumes;
     });
-    return resumes;
   }
 
   @Override
@@ -140,17 +139,6 @@ public class SqlStorage implements Storage {
       return result;
     }
     return null;
-  }
-
-  private List<Resume> getResumeList(ResultSet rs, String uuid) throws SQLException {
-    if (!rs.next()) {
-      throw new NotExistStorageException(uuid);
-    }
-    List<Resume> result = new ArrayList<>();
-    do {
-      result.add(getResume(rs, rs.getString("uuid")));
-    } while (!rs.isAfterLast());
-    return result;
   }
 
   private void saveContacts(Resume r, Connection conn) throws SQLException {
