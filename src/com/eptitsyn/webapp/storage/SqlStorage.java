@@ -236,5 +236,4 @@ public class SqlStorage implements Storage {
       }
     }
   }
-
 }
