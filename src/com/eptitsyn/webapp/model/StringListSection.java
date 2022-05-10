@@ -6,48 +6,48 @@ import java.util.Objects;
 
 public class StringListSection extends AbstractSection {
 
-    private static final long serialVersionUID = 1L;
-    private List<String> list;
+  private static final long serialVersionUID = 1L;
+  private List<String> list;
 
-    public StringListSection() {
-    }
+  public StringListSection() {
+  }
 
-    public StringListSection(String... items) {
-        this(Arrays.asList(items));
-    }
+  public StringListSection(String... items) {
+    this(Arrays.asList(items));
+  }
 
-    public StringListSection(List<String> list) {
-        Objects.requireNonNull(list);
-        this.list = list;
-    }
+  public StringListSection(List<String> list) {
+    Objects.requireNonNull(list);
+    this.list = list;
+  }
 
-    public List<String> getList() {
-        return list;
-    }
+  public List<String> getList() {
+    return list;
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(list);
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    StringListSection that = (StringListSection) o;
+    return Objects.equals(list, that.list);
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        StringListSection that = (StringListSection) o;
-        return Objects.equals(list, that.list);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(list);
+  }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        for (String s : list) {
-            builder.append(" * ").append(s).append("\n");
-        }
-        return builder.toString();
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    for (String s : list) {
+      builder.append(s).append("\n");
     }
+    return builder.toString();
+  }
 }
