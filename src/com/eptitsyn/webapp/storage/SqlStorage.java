@@ -42,16 +42,6 @@ public class SqlStorage implements Storage {
 
   @Override
   public Resume get(String uuid) {
-//    return sqlUtil.executeQuery(
-//            "SELECT * FROM resume " +
-//                    "LEFT JOIN contact on uuid=resume_uuid " +
-//                    "WHERE uuid=?",
-//            ps -> {
-//              ps.setObject(1, uuid);
-//              ResultSet rs = ps.executeQuery();
-//              Resume result = getResume(rs, uuid);
-//              return result;
-//            });
     return sqlUtil.transactionalExecute(conn -> {
       Resume result;
       try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM resume " +
@@ -91,19 +81,8 @@ public class SqlStorage implements Storage {
       try (PreparedStatement ps = conn.prepareStatement("SELECT * from section")) {
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
-          SectionType section_type = SectionType.valueOf(rs.getString("section_type"));
           Resume r = resumeHashMap.get(rs.getString("resume_uuid"));
-          switch (section_type) {
-            case PERSONAL:
-            case OBJECTIVE:
-              r.putSection(section_type, new StringSection(rs.getString("data")));
-              break;
-            case ACHIEVEMENTS:
-            case QUALIFICATIONS:
-              r.putSection(section_type, new StringListSection(
-                      rs.getString("data").split("\n")
-              ));
-          }
+          putSection(rs, r);
         }
       }
       return resumes;
@@ -172,28 +151,32 @@ public class SqlStorage implements Storage {
     return null;
   }
 
-  private void getSections(Resume r, Connection conn) throws SQLException {
+  private void getSections(Resume r, Connection conn) {
     sqlUtil.executeQuery(
             "SELECT * FROM section WHERE resume_uuid=?", ps -> {
               ps.setString(1, r.getUuid());
               ResultSet rs = ps.executeQuery();
               while (rs.next()) {
-                SectionType section_type = SectionType.valueOf(rs.getString("section_type"));
-                switch (section_type) {
-                  case PERSONAL:
-                  case OBJECTIVE:
-                    r.putSection(section_type, new StringSection(rs.getString("data")));
-                    break;
-                  case ACHIEVEMENTS:
-                  case QUALIFICATIONS:
-                    r.putSection(section_type, new StringListSection(
-                            rs.getString("data").split("\n")
-                    ));
-                }
+                putSection(rs, r);
 
               }
               return null;
             });
+  }
+
+  private void putSection(ResultSet rs, Resume r) throws SQLException {
+    SectionType sectionType = SectionType.valueOf(rs.getString("section_type"));
+    switch (sectionType) {
+      case PERSONAL:
+      case OBJECTIVE:
+        r.putSection(sectionType, new StringSection(rs.getString("data")));
+        break;
+      case ACHIEVEMENTS:
+      case QUALIFICATIONS:
+        r.putSection(sectionType, new StringListSection(
+                rs.getString("data").split("\n")
+        ));
+    }
   }
 
   private void saveContacts(Resume r, Connection conn) throws SQLException {
@@ -225,7 +208,6 @@ public class SqlStorage implements Storage {
         case OBJECTIVE:
         case ACHIEVEMENTS:
         case QUALIFICATIONS:
-          //
           try (PreparedStatement ps = conn.prepareStatement("INSERT INTO section (resume_uuid, section_type, data) VALUES (?,?,?)")) {
             ps.setString(1, r.getUuid());
             ps.setString(2, entry.getKey().name());
