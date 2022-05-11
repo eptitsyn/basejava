@@ -3,7 +3,7 @@ create table resume
     uuid      char(36) not null
         constraint resume_pk
             primary key,
-    full_name text not null
+    full_name text     not null
 );
 
 alter table resume
@@ -28,3 +28,15 @@ alter table contact
 create unique index contact_uuid_index
     on contact (resume_uuid, type);
 
+create table section
+(
+    resume_uuid  char(36)
+        constraint string_section_uuid_fk
+            references resume
+            on update restrict on delete cascade,
+    section_type text not null,
+    data         text
+);
+
+alter table section
+    owner to postgres;

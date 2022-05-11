@@ -206,12 +206,19 @@ public class SqlStorage implements Storage {
       switch (entry.getKey()) {
         case PERSONAL:
         case OBJECTIVE:
+          try (PreparedStatement ps = conn.prepareStatement("INSERT INTO section (resume_uuid, section_type, data) VALUES (?,?,?)")) {
+            ps.setString(1, r.getUuid());
+            ps.setString(2, entry.getKey().name());
+            ps.setString(3, ((StringSection) entry.getValue()).getText());
+            ps.execute();
+          }
+          break;
         case ACHIEVEMENTS:
         case QUALIFICATIONS:
           try (PreparedStatement ps = conn.prepareStatement("INSERT INTO section (resume_uuid, section_type, data) VALUES (?,?,?)")) {
             ps.setString(1, r.getUuid());
             ps.setString(2, entry.getKey().name());
-            ps.setString(3, entry.getValue().toString());
+            ps.setString(3, (String.join("\n", ((StringListSection) entry.getValue()).getList())));
             ps.execute();
           }
           break;
