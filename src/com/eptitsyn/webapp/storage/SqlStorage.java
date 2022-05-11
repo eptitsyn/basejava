@@ -180,22 +180,20 @@ public class SqlStorage implements Storage {
 
   private void saveSections(Resume r, Connection conn) throws SQLException {
     for (Map.Entry<SectionType, AbstractSection> entry : r.getSections().entrySet()) {
-      switch (entry.getKey()) {
-        case PERSONAL:
-        case OBJECTIVE:
-        case ACHIEVEMENTS:
-        case QUALIFICATIONS:
-          try (PreparedStatement ps = conn.prepareStatement("INSERT INTO section (resume_uuid, section_type, data) VALUES (?,?,?)")) {
-            ps.setString(1, r.getUuid());
-            ps.setString(2, entry.getKey().name());
-            if (entry.getKey() == SectionType.PERSONAL || entry.getKey() == SectionType.OBJECTIVE) {
-              ps.setString(3, ((StringSection) entry.getValue()).getText());
-            } else {
-              ps.setString(3, (String.join("\n", ((StringListSection) entry.getValue()).getList())));
-            }
-            ps.execute();
-          }
-          break;
+      try (PreparedStatement ps = conn.prepareStatement("INSERT INTO section (resume_uuid, section_type, data) VALUES (?,?,?)")) {
+        ps.setString(1, r.getUuid());
+        ps.setString(2, entry.getKey().name());
+        switch (entry.getKey()) {
+          case PERSONAL:
+          case OBJECTIVE:
+            ps.setString(3, ((StringSection) entry.getValue()).getText());
+            break;
+          case ACHIEVEMENTS:
+          case QUALIFICATIONS:
+            ps.setString(3, (String.join("\n", ((StringListSection) entry.getValue()).getList())));
+            break;
+        }
+        ps.execute();
       }
     }
   }
