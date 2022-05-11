@@ -6,10 +6,7 @@ import com.eptitsyn.webapp.model.*;
 import com.eptitsyn.webapp.sql.SqlUtil;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SqlStorage implements Storage {
 
@@ -44,9 +41,7 @@ public class SqlStorage implements Storage {
   public Resume get(String uuid) {
     return sqlUtil.transactionalExecute(conn -> {
       Resume result;
-      try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM resume " +
-              "LEFT JOIN contact on uuid=resume_uuid " +
-              "WHERE uuid=?")) {
+      try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM resume " + "LEFT JOIN contact on uuid=resume_uuid " + "WHERE uuid=?")) {
         ps.setObject(1, uuid);
         ResultSet rs = ps.executeQuery();
         result = getResume(rs, uuid);
@@ -59,23 +54,18 @@ public class SqlStorage implements Storage {
   @Override
   public List<Resume> getAllSorted() {
     return sqlUtil.transactionalExecute(conn -> {
-      List<Resume> resumes = new ArrayList<>();
-      HashMap<String, Resume> resumeHashMap = new HashMap<>();
-      try (PreparedStatement ps = conn.prepareStatement(
-              "SELECT * FROM resume ORDER BY full_name, uuid")) {
+      HashMap<String, Resume> resumeHashMap = new LinkedHashMap<>();
+      try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM resume ORDER BY full_name, uuid")) {
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
           Resume r = new Resume(rs.getString("uuid"), rs.getString("full_name"));
-          resumes.add(r);
           resumeHashMap.put(r.getUuid(), r);
         }
       }
-      try (PreparedStatement ps = conn.prepareStatement(
-              "SELECT * FROM contact")) {
+      try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM contact")) {
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
-          resumeHashMap.get(rs.getString("resume_uuid"))
-                  .addContact(ContactType.valueOf(rs.getString("type")), rs.getString("value"));
+          resumeHashMap.get(rs.getString("resume_uuid")).addContact(ContactType.valueOf(rs.getString("type")), rs.getString("value"));
         }
       }
       try (PreparedStatement ps = conn.prepareStatement("SELECT * from section")) {
@@ -85,14 +75,18 @@ public class SqlStorage implements Storage {
           putSection(rs, r);
         }
       }
-      return resumes;
+      return new ArrayList<>(resumeHashMap.values());
     });
   }
 
   @Override
   public void save(Resume r) {
     sqlUtil.transactionalExecute(conn -> {
-      saveResume(r, conn);
+      try (PreparedStatement ps = conn.prepareStatement("INSERT INTO resume (uuid, full_name) VALUES (?,?)")) {
+        ps.setString(1, r.getUuid());
+        ps.setString(2, r.getFullName());
+        ps.execute();
+      }
       saveContacts(r, conn);
       saveSections(r, conn);
       return null;
@@ -110,8 +104,7 @@ public class SqlStorage implements Storage {
   @Override
   public void update(Resume r) {
     sqlUtil.transactionalExecute(conn -> {
-      try (PreparedStatement ps = conn.prepareStatement(
-              "UPDATE resume SET full_name=? WHERE uuid=?")) {
+      try (PreparedStatement ps = conn.prepareStatement("UPDATE resume SET full_name=? WHERE uuid=?")) {
         ps.setObject(1, r.getFullName());
         ps.setObject(2, r.getUuid());
         if (ps.executeUpdate() != 1) {
@@ -125,8 +118,7 @@ public class SqlStorage implements Storage {
   }
 
   private void deleteContacts(Resume r, Connection conn) throws SQLException {
-    try (PreparedStatement ps = conn.prepareStatement(
-            "DELETE FROM contact WHERE resume_uuid=?")) {
+    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM contact WHERE resume_uuid=?")) {
       ps.setObject(1, r.getUuid());
       ps.execute();
     }
@@ -151,17 +143,14 @@ public class SqlStorage implements Storage {
     return null;
   }
 
-  private void getSections(Resume r, Connection conn) {
-    sqlUtil.executeQuery(
-            "SELECT * FROM section WHERE resume_uuid=?", ps -> {
-              ps.setString(1, r.getUuid());
-              ResultSet rs = ps.executeQuery();
-              while (rs.next()) {
-                putSection(rs, r);
-
-              }
-              return null;
-            });
+  private void getSections(Resume r, Connection conn) throws SQLException {
+    try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM section WHERE resume_uuid=?")) {
+      ps.setString(1, r.getUuid());
+      ResultSet rs = ps.executeQuery();
+      while (rs.next()) {
+        putSection(rs, r);
+      }
+    }
   }
 
   private void putSection(ResultSet rs, Resume r) throws SQLException {
@@ -173,15 +162,12 @@ public class SqlStorage implements Storage {
         break;
       case ACHIEVEMENTS:
       case QUALIFICATIONS:
-        r.putSection(sectionType, new StringListSection(
-                rs.getString("data").split("\n")
-        ));
+        r.putSection(sectionType, new StringListSection(rs.getString("data").split("\n")));
     }
   }
 
   private void saveContacts(Resume r, Connection conn) throws SQLException {
-    try (PreparedStatement ps = conn.prepareStatement(
-            "INSERT INTO contact (resume_uuid, type, value) VALUES (?,?,?)")) {
+    try (PreparedStatement ps = conn.prepareStatement("INSERT INTO contact (resume_uuid, type, value) VALUES (?,?,?)")) {
       for (Map.Entry<ContactType, String> e : r.getContacts().entrySet()) {
         ps.setString(1, r.getUuid());
         ps.setString(2, e.getKey().name());
@@ -192,33 +178,21 @@ public class SqlStorage implements Storage {
     }
   }
 
-  private void saveResume(Resume r, Connection conn) throws SQLException {
-    try (PreparedStatement ps = conn.prepareStatement(
-            "INSERT INTO resume (uuid, full_name) VALUES (?,?)")) {
-      ps.setString(1, r.getUuid());
-      ps.setString(2, r.getFullName());
-      ps.execute();
-    }
-  }
-
   private void saveSections(Resume r, Connection conn) throws SQLException {
     for (Map.Entry<SectionType, AbstractSection> entry : r.getSections().entrySet()) {
       switch (entry.getKey()) {
         case PERSONAL:
         case OBJECTIVE:
-          try (PreparedStatement ps = conn.prepareStatement("INSERT INTO section (resume_uuid, section_type, data) VALUES (?,?,?)")) {
-            ps.setString(1, r.getUuid());
-            ps.setString(2, entry.getKey().name());
-            ps.setString(3, ((StringSection) entry.getValue()).getText());
-            ps.execute();
-          }
-          break;
         case ACHIEVEMENTS:
         case QUALIFICATIONS:
           try (PreparedStatement ps = conn.prepareStatement("INSERT INTO section (resume_uuid, section_type, data) VALUES (?,?,?)")) {
             ps.setString(1, r.getUuid());
             ps.setString(2, entry.getKey().name());
-            ps.setString(3, (String.join("\n", ((StringListSection) entry.getValue()).getList())));
+            if (entry.getKey() == SectionType.PERSONAL || entry.getKey() == SectionType.OBJECTIVE) {
+              ps.setString(3, ((StringSection) entry.getValue()).getText());
+            } else {
+              ps.setString(3, (String.join("\n", ((StringListSection) entry.getValue()).getList())));
+            }
             ps.execute();
           }
           break;
