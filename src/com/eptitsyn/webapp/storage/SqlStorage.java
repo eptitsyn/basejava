@@ -2,8 +2,12 @@ package com.eptitsyn.webapp.storage;
 
 import com.eptitsyn.webapp.exception.NotExistStorageException;
 import com.eptitsyn.webapp.exception.StorageException;
-import com.eptitsyn.webapp.model.*;
+import com.eptitsyn.webapp.model.AbstractSection;
+import com.eptitsyn.webapp.model.ContactType;
+import com.eptitsyn.webapp.model.Resume;
+import com.eptitsyn.webapp.model.SectionType;
 import com.eptitsyn.webapp.sql.SqlUtil;
+import com.eptitsyn.webapp.util.JsonParser;
 
 import java.sql.*;
 import java.util.*;
@@ -113,12 +117,21 @@ public class SqlStorage implements Storage {
       }
       deleteContacts(r, conn);
       saveContacts(r, conn);
+      deleteSections(r, conn);
+      saveSections(r, conn);
       return null;
     });
   }
 
   private void deleteContacts(Resume r, Connection conn) throws SQLException {
     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM contact WHERE resume_uuid=?")) {
+      ps.setObject(1, r.getUuid());
+      ps.execute();
+    }
+  }
+
+  private void deleteSections(Resume r, Connection conn) throws SQLException {
+    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM section WHERE resume_uuid=?")) {
       ps.setObject(1, r.getUuid());
       ps.execute();
     }
@@ -154,15 +167,10 @@ public class SqlStorage implements Storage {
   }
 
   private void putSection(ResultSet rs, Resume r) throws SQLException {
-    SectionType sectionType = SectionType.valueOf(rs.getString("section_type"));
-    switch (sectionType) {
-      case PERSONAL:
-      case OBJECTIVE:
-        r.putSection(sectionType, new StringSection(rs.getString("data")));
-        break;
-      case ACHIEVEMENTS:
-      case QUALIFICATIONS:
-        r.putSection(sectionType, new StringListSection(rs.getString("data").split("\n")));
+    String data = rs.getString("data");
+    if (data != null) {
+      SectionType sectionType = SectionType.valueOf(rs.getString("section_type"));
+      r.putSection(sectionType, JsonParser.read(data, AbstractSection.class));
     }
   }
 
@@ -179,22 +187,15 @@ public class SqlStorage implements Storage {
   }
 
   private void saveSections(Resume r, Connection conn) throws SQLException {
-    for (Map.Entry<SectionType, AbstractSection> entry : r.getSections().entrySet()) {
-      try (PreparedStatement ps = conn.prepareStatement("INSERT INTO section (resume_uuid, section_type, data) VALUES (?,?,?)")) {
+    try (PreparedStatement ps = conn.prepareStatement("INSERT INTO section (resume_uuid, section_type, data) VALUES (?,?,?)")) {
+      for (Map.Entry<SectionType, AbstractSection> entry : r.getSections().entrySet()) {
         ps.setString(1, r.getUuid());
         ps.setString(2, entry.getKey().name());
-        switch (entry.getKey()) {
-          case PERSONAL:
-          case OBJECTIVE:
-            ps.setString(3, ((StringSection) entry.getValue()).getText());
-            break;
-          case ACHIEVEMENTS:
-          case QUALIFICATIONS:
-            ps.setString(3, (String.join("\n", ((StringListSection) entry.getValue()).getList())));
-            break;
-        }
-        ps.execute();
+        AbstractSection section = entry.getValue();
+        ps.setString(3, JsonParser.write(section, AbstractSection.class));
+        ps.addBatch();
       }
+      ps.executeBatch();
     }
   }
 }

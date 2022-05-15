@@ -25,6 +25,10 @@ public class StringListSection extends AbstractSection {
     return list;
   }
 
+  public String getString() {
+    return String.join("\n", list);
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {

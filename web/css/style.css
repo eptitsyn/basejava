@@ -1,0 +1,26 @@
+table, th, td {
+    border: 1px solid;
+}
+
+header {
+    background: lightskyblue;
+    padding: 1em;
+}
+
+footer {
+    background: lightskyblue;
+    padding: 1em;
+}
+
+input[type=text], input[type=url] {
+    width: 100%;
+}
+
+textarea {
+    width: 100%;
+    height: fit-content;
+}
+
+section {
+    width: 70%;
+}
