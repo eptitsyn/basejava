@@ -14,6 +14,13 @@
 </head>
 <body>
 <jsp:include page="fragments/header.jsp"/>
+<nav>
+    <form action="resume">
+        <input type="hidden" name="uuid" value="${resume.uuid}">
+        <input type="hidden" name="action" value="edit">
+        <input type="submit" value="Edit"/>
+    </form>
+</nav>
 <section>
     <h1>${resume.fullName}</h1>
     <%--    uuid ${resume.uuid}--%>

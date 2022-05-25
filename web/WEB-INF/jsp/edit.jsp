@@ -20,7 +20,7 @@
         <input type="hidden" name="action" value="edit">
         <input type="hidden" name="uuid" value="${resume.uuid}">
         <label>FullName
-            <input type="text" name="fullName" value="${resume.fullName}"/>
+            <input type="text" name="fullName" value="${resume.fullName}" pattern="^\w{1,}(\s\w{1,})*$"/>
         </label>
         <h2>Contacts</h2>
         <c:forEach items="${ContactType.values()}" var="contact">
@@ -50,7 +50,9 @@
                             <label>Name<input type="text" name="${section.name()}_${orgConter.index}_name"
                                               value="${organisation.name}"></label><br>
                             <label>URL<input type="url" name="${section.name()}_${orgConter.index}_url"
-                                             value="${organisation.website.toString()}"></label><br>
+                                             value="${organisation.website.toString()}"
+                                             pattern="https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)">
+                            </label><br>
                             <input type="hidden" name="${section.name()}_${orgConter.index}_posCount"
                                    value="${organisation.positions.size()}">
                             <c:forEach items="${organisation.positions}" var="position" varStatus="posCounter">
@@ -75,7 +77,7 @@
         </c:forEach>
         <br>
         <button type="submit">Save</button>
-        <button onclick="window.location='resumes'">Back</button>
+        <button type="button" onclick="window.location='resume'">Back</button>
     </form>
 </section>
 <jsp:include page="fragments/footer.jsp"/>
