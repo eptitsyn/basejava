@@ -20,7 +20,8 @@
         <input type="hidden" name="action" value="edit">
         <input type="hidden" name="uuid" value="${resume.uuid}">
         <label>FullName
-            <input type="text" name="fullName" value="${resume.fullName}" pattern="^\w{1,}(\s\w{1,})*$"/>
+            <input type="text" name="fullName" value="${resume.fullName}"
+                   pattern="^[А-Яа-яЁё\w]{1,}(\s[А-Яа-яЁё\w]{1,})*$"/>
         </label>
         <h2>Contacts</h2>
         <c:forEach items="${ContactType.values()}" var="contact">

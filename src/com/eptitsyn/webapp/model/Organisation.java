@@ -53,6 +53,10 @@ public class Organisation implements Serializable {
     return website;
   }
 
+  public boolean isEmpty() {
+    return name.isEmpty() && positions.isEmpty();
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -114,7 +118,7 @@ public class Organisation implements Serializable {
     }
 
     public Position(String startDate, String endDate, String title, String description) {
-      this(LocalDate.parse(startDate), LocalDate.parse(endDate), title, description);
+      this(DateUtil.parse(startDate), DateUtil.parse(endDate), title, description);
     }
 
     public String getDescription() {
@@ -131,6 +135,10 @@ public class Organisation implements Serializable {
 
     public String getTitle() {
       return title;
+    }
+
+    public boolean isEmpty() {
+      return title.isEmpty() && description.isEmpty();
     }
 
     @Override

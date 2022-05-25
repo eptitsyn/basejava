@@ -45,12 +45,15 @@ public class ResumeServlet extends HttpServlet {
         break;
       case "edit":
       case "add":
-        if (uuid != null) {
-          Resume r = storage.get(uuid);
-          request.setAttribute("resume", r);
-        } else {
-          request.setAttribute("resume", new Resume());
+        Resume r = uuid == null ? new Resume() : storage.get(uuid);
+        for (SectionType sectionType : new SectionType[]{SectionType.EXPERIENCE, SectionType.EDUCATION}) {
+          Experience experience = (Experience) r.getSection(sectionType);
+          experience.getOrganisations().add(new Organisation());
+          for (Organisation organisation : experience.getOrganisations()) {
+            organisation.getPositions().add(new Organisation.Position());
+          }
         }
+        request.setAttribute("resume", r);
         request.getRequestDispatcher("/WEB-INF/jsp/edit.jsp").forward(request, response);
         return;
       case "clear":
@@ -134,9 +137,15 @@ public class ResumeServlet extends HttpServlet {
               String endDate = request.getParameter(sectionType.name() + "_" + i + "_" + j + "_endDate");
               String title = request.getParameter(sectionType.name() + "_" + i + "_" + j + "_title");
               String description = request.getParameter(sectionType.name() + "_" + i + "_" + j + "_description");
-              positions.add(new Organisation.Position(startDate, endDate, title, description));
+              Organisation.Position position = new Organisation.Position(startDate, endDate, title, description);
+              if (!position.isEmpty()) {
+                positions.add(position);
+              }
             }
-            organisations.add(new Organisation(name, url, positions));
+            Organisation organisation = new Organisation(name, url, positions);
+            if (!organisation.isEmpty()) {
+              organisations.add(organisation);
+            }
           }
           r.putSection(sectionType, new Experience(organisations));
       }
