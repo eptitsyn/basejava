@@ -52,7 +52,7 @@
                 </ul>
             </c:when>
             <c:when test="${section.value['class'].name == 'com.eptitsyn.webapp.model.Experience'}">
-                <ul>
+                <ul class="organisations">
                     <c:forEach items="${section.value.getOrganisations()}" var="organisation">
                         <jsp:useBean id="organisation" type="com.eptitsyn.webapp.model.Organisation"/>
                         <li><h3>
@@ -61,7 +61,7 @@
                                 ${organisation.name}
                             <c:if test="${organisation.website != null}"></a></c:if>
                         </h3>
-                            <ul>
+                            <ul class="positions">
                                 <c:forEach items="${organisation.positions}" var="position">
 
                                     <li>${position.title} ${DateUtil.dateToString(position.startDate)}

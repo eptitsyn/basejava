@@ -23,9 +23,9 @@ public class DateUtil {
   }
 
   public static String dateToString(LocalDate date) {
-    if (date.isAfter(LocalDate.now())) {
+    if (date.isAfter(LocalDate.now().minusDays(1))) {
       return "Сейчас";
     }
-    return date.format(DateTimeFormatter.ofPattern("yyyy-MM-01"));
+    return date.format(DateTimeFormatter.ofPattern("yyyy-MM"));
   }
 }
