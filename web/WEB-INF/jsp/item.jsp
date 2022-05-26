@@ -1,6 +1,7 @@
 <jsp:useBean id="resume" scope="request" type="com.eptitsyn.webapp.model.Resume"/>
 <%@ page import="com.eptitsyn.webapp.model.ContactType" %>
 <%@ page import="com.eptitsyn.webapp.model.Resume" %>
+<%@ page import="com.eptitsyn.webapp.util.DateUtil" %>
 <%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -62,7 +63,9 @@
                         </h3>
                             <ul>
                                 <c:forEach items="${organisation.positions}" var="position">
-                                    <li>${position.title} ${position.startDate} - ${position.endDate} <br/>
+
+                                    <li>${position.title} ${DateUtil.dateToString(position.startDate)}
+                                        - ${DateUtil.dateToString(position.endDate)} <br/>
                                         <p>${position.description}</p>
                                     </li>
                                 </c:forEach>
