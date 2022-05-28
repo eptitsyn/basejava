@@ -48,29 +48,37 @@
                                    varStatus="orgConter">
                             <jsp:useBean id="organisation" type="com.eptitsyn.webapp.model.Organisation"/>
                             <hr>
-                            <label>Name<input type="text" name="${section.name()}_${orgConter.index}_name"
-                                              value="${organisation.name}"></label><br>
-                            <label>URL<input type="url" name="${section.name()}_${orgConter.index}_url"
-                                             value="${organisation.website.toString()}"
-                                             pattern="https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)">
-                            </label><br>
-                            <input type="hidden" name="${section.name()}_${orgConter.index}_posCount"
-                                   value="${organisation.positions.size()}">
-                            <c:forEach items="${organisation.positions}" var="position" varStatus="posCounter">
-                                <jsp:useBean id="position" type="com.eptitsyn.webapp.model.Organisation.Position"/>
-                                <label>Start date<input type="date"
-                                                        name="${section.name()}_${orgConter.index}_${posCounter.index}_startDate"
-                                                        value="${position.startDate.toString()}"></label><br>
-                                <label>End date<input type="date"
-                                                      name="${section.name()}_${orgConter.index}_${posCounter.index}_endDate"
-                                                      value="${position.endDate.toString()}"></label><br>
-                                <label>Title<input type="text"
-                                                   name="${section.name()}_${orgConter.index}_${posCounter.index}_title"
-                                                   value="${position.title}"></label><br>
-                                <label>Description<input type="text"
-                                                         name="${section.name()}_${orgConter.index}_${posCounter.index}_description"
-                                                         value="${position.description}"></label><br>
-                            </c:forEach>
+                            <div class="organisation"><h3><c:if
+                                    test="${orgConter.index == resume.getSection(section).organisations.size() - 1}">New </c:if>Organisation</h3>
+                                <label>Name<input type="text" name="${section.name()}_${orgConter.index}_name"
+                                                  value="${organisation.name}"></label><br>
+                                <label>URL<input type="url" name="${section.name()}_${orgConter.index}_url"
+                                                 value="${organisation.website.toString()}"
+                                                 pattern="https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)">
+                                </label><br>
+                                <input type="hidden" name="${section.name()}_${orgConter.index}_posCount"
+                                       value="${organisation.positions.size()}">
+                                <c:forEach items="${organisation.positions}" var="position" varStatus="posCounter">
+                                    <div class="position">
+                                        <h4><c:if
+                                                test="${posCounter.index == organisation.positions.size() - 1}">New </c:if>Position</h4>
+                                        <jsp:useBean id="position"
+                                                     type="com.eptitsyn.webapp.model.Organisation.Position"/>
+                                        <label>Start date<input type="date"
+                                                                name="${section.name()}_${orgConter.index}_${posCounter.index}_startDate"
+                                                                value="${position.startDate.toString()}"></label><br>
+                                        <label>End date<input type="date"
+                                                              name="${section.name()}_${orgConter.index}_${posCounter.index}_endDate"
+                                                              value="${position.endDate.toString()}"></label><br>
+                                        <label>Title<input type="text"
+                                                           name="${section.name()}_${orgConter.index}_${posCounter.index}_title"
+                                                           value="${position.title}"></label><br>
+                                        <label>Description<input type="text"
+                                                                 name="${section.name()}_${orgConter.index}_${posCounter.index}_description"
+                                                                 value="${position.description}"></label><br>
+                                    </div>
+                                </c:forEach>
+                            </div>
                         </c:forEach>
                     </c:when>
                 </c:choose>

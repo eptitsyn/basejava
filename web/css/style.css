@@ -24,3 +24,11 @@ textarea {
 section {
     width: 70%;
 }
+
+.organisation {
+    margin-left: 10px;
+}
+
+.position {
+    margin-left: 30px;
+}
